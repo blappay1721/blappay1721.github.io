@@ -73,7 +73,7 @@ const still = matchMedia('(prefers-reduced-motion: reduce)');
 function countUp(el) {
     const text = el.dataset.final ??= el.textContent;
     const m = text.match(/\d[\d,]*(\.\d+)?/);
-    if (!m || still.matches) return;
+    if (!m) return;
     const target = parseFloat(m[0].replaceAll(',', '')), places = m[1] ? m[1].length - 1 : 0;
     const fmt = v => text.replace(m[0], v.toLocaleString('en-US', { minimumFractionDigits: places, maximumFractionDigits: places }));
     const start = performance.now(), dur = 900;
