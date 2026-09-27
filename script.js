@@ -141,18 +141,20 @@ document.querySelectorAll('.result b').forEach(b => counter.observe(b));
     });
 })();
 
-// Email: clicking copies the address
+// Email: clicking copies the address; the label briefly reads "Copied ✓"
 document.querySelectorAll('.email').forEach(btn => {
-    const note = btn.querySelector('small');
+    const label = btn.querySelector('span'), email = btn.dataset.email;
     btn.addEventListener('click', async () => {
+        btn.style.minWidth = btn.offsetWidth + 'px';  // keep the pill from shrinking
         try {
-            await navigator.clipboard.writeText(btn.dataset.email);
-            note.textContent = 'Copied ✓';
+            await navigator.clipboard.writeText(email);
+            label.textContent = 'Copied ✓';
         } catch {
-            getSelection().selectAllChildren(btn);
-            note.textContent = 'Press Ctrl+C';
+            label.textContent = email;
+            getSelection().selectAllChildren(label);  // clipboard blocked: select it for Ctrl+C
+            return;
         }
         clearTimeout(btn.reset);
-        btn.reset = setTimeout(() => note.textContent = 'Copy', 2000);
+        btn.reset = setTimeout(() => { label.textContent = email; btn.style.minWidth = ''; }, 2000);
     });
 });
