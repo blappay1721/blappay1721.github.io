@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bernard Lappay</title>
-    <meta name="description" content="Bernard Lappay, Computer Engineering student at UC San Diego. Machine learning, LLM inference, and backend systems for live multiplayer games.">
+    <meta name="description" content="Bernard Lappay, Computer Engineering student at UC San Diego. Machine learning, LLM inference, Linux infrastructure, digital design, and backend systems for live multiplayer games.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -138,16 +138,19 @@
             </div>
             <ul>
                 <li>Traced a spatial-query bottleneck in a core gameplay system and fixed it with a custom Python tool built on a computational-geometry simplification algorithm.</li>
-                <li>Designed real-time encounters with multi-stage attacks driven by timing-based state machines that prevent race conditions.</li>
+                <li>Designed real-time encounters with multi-stage attacks driven by timing-based state machines, with ordered failsafes that prevent race conditions.</li>
+                <li>Closed a time-of-check/time-of-use exploit in a core gameplay interaction, then rolled the fix across dozens of config files with a scripted, diff-verified patch.</li>
+                <li>Moving world-entity systems from ephemeral spawn/despawn lifecycles to persistent, state-driven designs, validating each piece with isolated probe tests before rollout.</li>
+                <li>Built a Python automation harness, with checkpointing and pause/resume, to audit the default permission set empirically.</li>
                 <li>Hardened public-facing infrastructure against abuse and unauthorized access.</li>
-                <li>Lead ongoing performance and compatibility work across a large stack of interoperating systems.</li>
+                <li>Diagnose JVM dependency and version-compatibility failures across a multi-node deployment of interoperating systems, and keep a ledger of confirmed platform regressions.</li>
             </ul>
             <p class="stack">Java, Python, Linux administration, SSH/SFTP</p>
         </div>
     </section>
 
     <section>
-        <h2>Projects</h2>
+        <h2>Machine learning</h2>
         <div class="projects">
             <details open>
                 <summary>
@@ -155,52 +158,203 @@
                         <h3>Adaptive math-reasoning inference pipeline</h3>
                         <p class="sub">LLM inference for a class Kaggle competition, ranked #29</p>
                     </div>
-                    <div class="result"><b>68/100</b><small>up from 61 single-pass</small></div>
+                    <div class="result"><b>68/100</b><small>up from 61 with voting alone</small></div>
                     <span class="toggle" aria-hidden="true"></span>
                 </summary>
                 <div class="body">
                     <ul>
-                        <li>Made a fixed 4B model (Qwen3-4B-Thinking-2507) more reliable at math without changing its weights for the main path.</li>
-                        <li>Verifier-guided majority vote: three candidates per problem, two must agree. Failures retry with a larger token budget, re-prompted with prior attempts and verifier feedback.</li>
-                        <li>Audited and cleaned 7,500 distilled examples, trained LoRA SFT and DPO adapters, and used the adapter only as a targeted fallback.</li>
-                        <li>Multiple-choice accuracy rose from 73.6% to 81.6%. Batched inference ran on vLLM on an H100.</li>
+                        <li>Made a fixed 4B model (Qwen3-4B-Thinking-2507) more reliable at math through inference-time design rather than retraining.</li>
+                        <li>Verifier-guided majority vote: three candidates per problem, two must agree, with answers normalized across multiple-choice and free-response formats. Failures retry with a larger token budget, re-prompted with prior attempts, vote history and verifier feedback.</li>
+                        <li>Audited and repaired 7,500 distilled examples and trained LoRA SFT and DPO adapters. Noisy data first cut accuracy (61 to 58); the cleaned adapter still didn't beat the base model overall, so it runs only as a fallback on unresolved multiple-choice questions, where it helps.</li>
+                        <li>Checkpointed, resumable batch inference with vLLM on rented H100s. In an early milestone run, voting and retries lifted multiple-choice accuracy from 73.6% to 81.6%.</li>
                     </ul>
-                    <p class="stack">Python, vLLM, Hugging Face, LoRA, DPO, RunPod</p>
+                    <p class="stack">Python, vLLM, Hugging Face, LoRA, DPO, RunPod · <a href="https://github.com/blappay1721/151B_SP26_Competition">Code</a></p>
                 </div>
             </details>
             <details>
                 <summary>
                     <div class="title">
-                        <h3>Movie recommendation system</h3>
-                        <p class="sub">Probabilistic model trained on incomplete ratings</p>
+                        <h3>Persona chatbot and Discord bot platform</h3>
+                        <p class="sub">Style-conditioned generation with dual-index retrieval</p>
                     </div>
-                    <div class="result"><b>80%</b><small>accuracy on seen ratings</small></div>
+                    <div class="result"><b>300k+</b><small>messages analyzed</small></div>
                     <span class="toggle" aria-hidden="true"></span>
                 </summary>
                 <div class="body">
                     <ul>
-                        <li>Naive Bayes recommender trained with Expectation–Maximization on partially observed binary ratings, with stable likelihood convergence.</li>
-                        <li>300 users and 60 movies: 10,444 observed ratings, 6,836 estimated.</li>
-                        <li>Produces personalized predictions for every user's unseen movies.</li>
+                        <li>Ran stylometric analysis over 300,000+ messages to measure each author's linguistic fingerprint, then used an LLM to condense the stats and example messages into compact style descriptors.</li>
+                        <li>Dual-index RAG: separate indexes for persona style and topical facts, so style fidelity and factual accuracy don't trade off.</li>
+                        <li>Slash commands with channel-scoped responses, AI chat through Ollama, and vote-gated group commands, served by Express behind a Cloudflare tunnel.</li>
                     </ul>
-                    <p class="stack">Python, NumPy</p>
+                    <p class="stack">Node.js, discord.js, Express, Ollama, Cloudflare Tunnel · <a href="https://github.com/blappay1721/bruh">Code</a></p>
+                </div>
+            </details>
+            <details>
+                <summary>
+                    <div class="title">
+                        <h3>Movie recommender with EM</h3>
+                        <p class="sub">Latent-class model trained on incomplete ratings</p>
+                    </div>
+                    <div class="result"><b>40%</b><small>of ratings missing</small></div>
+                    <span class="toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="body">
+                    <ul>
+                        <li>Naive Bayes model with four hidden movie-goer types, trained from scratch with Expectation–Maximization on a 288 × 60 survey.</li>
+                        <li>Vectorized EM in log space with log-sum-exp for stability. Log-likelihood never decreases and converges to the course reference value to four decimal places.</li>
+                        <li>Interactive survey: rate the movies you've seen and it infers your type mix and ranks the ones you haven't.</li>
+                    </ul>
+                    <p class="stack">Python, NumPy, ipywidgets · <a href="https://github.com/blappay1721/EM-Movie-Recommender">Code</a></p>
                 </div>
             </details>
             <details>
                 <summary>
                     <div class="title">
                         <h3>Handwritten digit recognition</h3>
-                        <p class="sub">Nearest-neighbor classifier on MNIST</p>
+                        <p class="sub">Nearest-neighbor classifier on MNIST, with a draw-a-digit demo</p>
                     </div>
-                    <div class="result"><b>95%+</b><small>on 1,000 test digits</small></div>
+                    <div class="result"><b>95.4%</b><small>on 1,000 test digits</small></div>
                     <span class="toggle" aria-hidden="true"></span>
                 </summary>
                 <div class="body">
                     <ul>
-                        <li>1-NN classifier over a 7,500-image training set.</li>
-                        <li>Vectorized batch prediction and confusion-matrix evaluation to see which digits get mistaken for which.</li>
+                        <li>1-NN over 7,500 training images in NumPy. One vectorized distance computation classifies the whole test set in about 0.25 s, benchmarked against scikit-learn's KDTree and BallTree.</li>
+                        <li>Confusion matrix and misclassified examples shown next to the training images they matched.</li>
+                        <li>Browser demo runs the same search in JavaScript: draw a digit and see its five nearest training images.</li>
                     </ul>
-                    <p class="stack">Python, NumPy</p>
+                    <p class="stack">Python, NumPy, JavaScript · <a href="https://blappay1721.github.io/MNIST-NN-Classifier/">Live demo</a> · <a href="https://github.com/blappay1721/MNIST-NN-Classifier">Code</a></p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <section>
+        <h2>Systems and servers</h2>
+        <div class="projects">
+            <details>
+                <summary>
+                    <div class="title">
+                        <h3>Self-hosted game server infrastructure</h3>
+                        <p class="sub">Multi-server network on a headless Ubuntu homelab</p>
+                    </div>
+                    <div class="result"><b>~55</b><small>plugins in production</small></div>
+                    <span class="toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="body">
+                    <ul>
+                        <li>Several Paper backends behind a Velocity proxy, managed with Pterodactyl/Wings in Docker.</li>
+                        <li>Firewall and intrusion prevention with ufw and fail2ban: rate-limited SSH, an admin-only panel port, and a custom jail whose filter I rewrote to catch slow read-timeout bot scanners. Checked reachability end to end with ss, tcpdump and external probes.</li>
+                        <li>Traced recurring NVMe timeouts, controller resets and a watchdog crash to a firmware power-state (APST) bug and fixed it with a kernel boot parameter.</li>
+                        <li>Traced mass player disconnects to Wi-Fi power management and mesh roaming, and made the fix persistent in NetworkManager.</li>
+                        <li>Moved large data sets to secondary storage with copy, checksum dry-run, delete, then symlink, on UUID-based mounts.</li>
+                    </ul>
+                    <p class="stack">Ubuntu Server, Docker, Pterodactyl, ufw, fail2ban, iptables, Pi-hole, tmux, PM2</p>
+                </div>
+            </details>
+            <details>
+                <summary>
+                    <div class="title">
+                        <h3>UncapDefense</h3>
+                        <p class="sub">Paper plugin that lifts vanilla's armor damage-reduction cap</p>
+                    </div>
+                    <div class="result"><b>80%</b><small>ceiling removed</small></div>
+                    <span class="toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="body">
+                    <ul>
+                        <li>Replaces the hard clamp with a curve that matches vanilla exactly below the cap and approaches 100% asymptotically above it, so extra armor always helps a little.</li>
+                        <li>Raises Bukkit's attribute limits through reflection into the server's attribute registry, falling back to summing modifiers by hand if a future build breaks it.</li>
+                        <li>Fixed a bug where a deprecated damage-modifier API double-applied armor and turned hits into healing. The damage formula is checked with Python unit tests.</li>
+                    </ul>
+                    <p class="stack">Java 21, Maven, Paper API · <a href="https://github.com/blappay1721/UncapDefense">Code</a></p>
+                </div>
+            </details>
+            <details>
+                <summary>
+                    <div class="title">
+                        <h3>PlacedOnlyBreak</h3>
+                        <p class="sub">Paper plugin for resettable build arenas</p>
+                    </div>
+                    <span class="toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="body">
+                    <ul>
+                        <li>Inside chosen WorldGuard regions, players can break only blocks placed after the region was armed. Terrain and earlier builds stay protected.</li>
+                        <li>Uses CoreProtect's block log as the source of truth, with a 10-second in-memory cache covering its async write delay.</li>
+                        <li>Overlapping regions apply the strictest cutoff. Admin commands arm, add and remove regions with tab completion.</li>
+                    </ul>
+                    <p class="stack">Java 21, Maven, Paper API, WorldGuard, CoreProtect · <a href="https://github.com/blappay1721/placedonlybreak">Code</a></p>
+                </div>
+            </details>
+            <details>
+                <summary>
+                    <div class="title">
+                        <h3>AwesomeChat DiscordSRV Addon</h3>
+                        <p class="sub">Open-source fork that renders in-game items into Discord</p>
+                    </div>
+                    <span class="toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="body">
+                    <ul>
+                        <li>Rewired an existing item and inventory renderer to read a different chat plugin, so <code>[item]</code>, <code>[inv]</code> and <code>[ec]</code> show up in Discord as rendered images.</li>
+                        <li>Trigger syntax and permissions come straight from the host chat plugin's config, so the two can never disagree.</li>
+                    </ul>
+                    <p class="stack">Java 21, Maven, Paper API, DiscordSRV · <a href="https://github.com/blappay1721/AwesomeChat-DiscordSRV-Addon">Code</a></p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <section>
+        <h2>Digital design</h2>
+        <div class="projects">
+            <details>
+                <summary>
+                    <div class="title">
+                        <h3>Microprogrammed signed multiplier</h3>
+                        <p class="sub">Robertson's algorithm with a microcoded control unit</p>
+                    </div>
+                    <div class="result"><b>16,384</b><small>products checked exhaustively</small></div>
+                    <span class="toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="body">
+                    <ul>
+                        <li>Parameterized two's-complement multiplier split into a datapath and a control unit driven by an 18-word microcode ROM with conditional branches on datapath flags.</li>
+                        <li>Self-checking testbench runs directed cases, then every 7-bit signed operand pair.</li>
+                    </ul>
+                    <p class="stack">SystemVerilog, ModelSim · <a href="https://github.com/blappay1721/robertsons-multiplier-sv">Code</a></p>
+                </div>
+            </details>
+            <details>
+                <summary>
+                    <div class="title">
+                        <h3>LFSR message encryptor</h3>
+                        <p class="sub">Hardware stream cipher reading and writing on-chip memory</p>
+                    </div>
+                    <span class="toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="body">
+                    <ul>
+                        <li>A 6-bit LFSR with loadable taps and seed generates the keystream. A control sequencer loads its configuration from memory, writes a scrambled preamble, then encrypts the message.</li>
+                        <li>Self-checking testbench computes the same encryption in software and compares byte by byte.</li>
+                    </ul>
+                    <p class="stack">SystemVerilog, ModelSim · <a href="https://github.com/blappay1721/lfsr-encryptor-sv">Code</a></p>
+                </div>
+            </details>
+            <details>
+                <summary>
+                    <div class="title">
+                        <h3>Digital alarm clock with calendar</h3>
+                        <p class="sub">Three versions, from basic clock to month-aware calendar</p>
+                    </div>
+                    <span class="toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="body">
+                    <ul>
+                        <li>Every counter is one reusable modulo-N module, chained by carry signals, and drives 7-segment displays through binary-to-BCD conversion.</li>
+                        <li>Adds day-of-week alarm suppression and correct month lengths with rollover. Testbenches print the displays as ASCII 7-segment digits.</li>
+                    </ul>
+                    <p class="stack">SystemVerilog, ModelSim · <a href="https://github.com/blappay1721/alarm-clock-sv">Code</a></p>
                 </div>
             </details>
         </div>
@@ -212,10 +366,11 @@
             <h3>B.S. Computer Engineering, UC San Diego</h3>
             <p class="sub">Expected June 2027</p>
             <ul>
-                <li>Probabilistic Models in AI and ML: Learning Algorithms (Python)</li>
-                <li>Computer Design and Architecture (Verilog, C, Assembly)</li>
-                <li>Object-Oriented Programming and Data Structures (Java)</li>
-                <li>Probability and Statistics for Engineers (MATLAB, Python)</li>
+                <li>Machine Learning: Learning Algorithms (CSE 151A) and Deep Learning (CSE 151B)</li>
+                <li>Probabilistic Reasoning in AI and Computer Vision (CSE 152A)</li>
+                <li>Computer Design and Architecture (Verilog, C, MIPS assembly)</li>
+                <li>Object-Oriented Programming and Data Structures (Java), Discrete Math and Algorithms</li>
+                <li>Data Networks, Probability and Statistics for Engineers, Circuits</li>
             </ul>
         </div>
     </section>
@@ -223,9 +378,12 @@
     <section>
         <h2>Skills</h2>
         <div class="skills">
-            <div><h3>Languages</h3><p>Java and Python (4 years), C, MATLAB, Bash, JavaScript, Assembly, Verilog</p></div>
-            <div><h3>ML and inference</h3><p>vLLM, Hugging Face, Ollama, RunPod, NumPy</p></div>
-            <div><h3>Systems and tools</h3><p>Linux, Git, SSH/SFTP, PM2, Maven, Vim, VS Code, HTML/CSS</p></div>
+            <div><h3>Languages</h3><p>Java and Python (4 years), C, JavaScript, MATLAB, Bash, SystemVerilog, MIPS assembly, C++, HTML/CSS</p></div>
+            <div><h3>ML and inference</h3><p>vLLM, Hugging Face, LoRA (SFT, DPO), RAG, Ollama, NumPy, RunPod</p></div>
+            <div><h3>Linux and DevOps</h3><p>Ubuntu Server, Docker, Pterodactyl, systemd, NetworkManager, LVM, rsync, tmux, PM2</p></div>
+            <div><h3>Networking and security</h3><p>ufw, fail2ban, iptables, tcpdump, ss, Pi-hole/DNS, SSH/SFTP</p></div>
+            <div><h3>Server development</h3><p>Java 21, Maven, Paper API, Velocity, JVM stack-trace debugging</p></div>
+            <div><h3>Tools</h3><p>Git, Vim, VS Code Remote, ModelSim, LaTeX</p></div>
         </div>
     </section>
 
