@@ -95,6 +95,25 @@
         :root { interpolate-size: allow-keywords; }
         @media (prefers-reduced-motion: reduce) { details::details-content, .toggle { transition: none; } }
 
+        /* Project categories: cards that cycle through their projects and open the full list */
+        .cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .cat {
+            font: inherit; color: inherit; text-align: left; cursor: pointer; border: 0;
+            background: var(--cell-b); box-shadow: inset 0 0 0 1.5px var(--rule); border-radius: 16px;
+            padding: 20px; display: flex; flex-direction: column; transition: box-shadow .2s;
+        }
+        .cat:hover { box-shadow: inset 0 0 0 1.5px var(--cobalt); }
+        .cat[aria-expanded="true"] { box-shadow: inset 0 0 0 2.5px var(--cobalt); }
+        .cat:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 4px; }
+        .cat-name { font-weight: 700; font-size: 1.15rem; line-height: 1.2; }
+        .cat-count { color: var(--soft); font-size: 0.9rem; }
+        .tick { display: block; margin-top: 24px; min-height: 6em; transition: opacity .3s; }
+        .tick.fade { opacity: 0; }
+        .tick b { display: block; font-size: 2rem; font-weight: 900; letter-spacing: -0.04em; line-height: 1; color: var(--cobalt); }
+        .tick small { display: block; color: var(--soft); font-size: 0.85rem; }
+        .tick span { display: block; font-weight: 500; margin-top: 8px; line-height: 1.3; }
+        .cats + .projects, .projects + .projects { margin-top: 32px; }
+
         .skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
         .skills h3 { font-size: 1rem; margin-bottom: 6px; }
         .skills p { margin: 0; color: var(--soft); }
@@ -131,8 +150,8 @@
         <div>
             <div class="job">
                 <div>
-                    <h3>Technical Contributor, Silent Studios</h3>
-                    <p class="sub">Mineshoku Tensei, a live-service multiplayer game. Remote, June 2026 to present.</p>
+                    <h3>Technical Contributor, <a href="https://silent-studio.net/">Silent Studios</a></h3>
+                    <p class="sub"><a href="https://mineshokutensei.com/">Mineshoku Tensei</a>, a live-service multiplayer game. Remote, June 2026 to present.</p>
                 </div>
                 <div class="result"><b>−86%</b><small>data complexity in a core<br>spatial-query system</small></div>
             </div>
@@ -150,8 +169,26 @@
     </section>
 
     <section>
-        <h2>Machine learning</h2>
-        <div class="projects">
+        <h2>Projects</h2>
+        <div>
+            <div class="cats">
+                <button class="cat" type="button" aria-expanded="false" aria-controls="p-ml">
+                    <span class="cat-name">Machine learning</span>
+                    <span class="cat-count"></span>
+                    <span class="tick" aria-hidden="true"></span>
+                </button>
+                <button class="cat" type="button" aria-expanded="false" aria-controls="p-sys">
+                    <span class="cat-name">Systems and servers</span>
+                    <span class="cat-count"></span>
+                    <span class="tick" aria-hidden="true"></span>
+                </button>
+                <button class="cat" type="button" aria-expanded="false" aria-controls="p-hw">
+                    <span class="cat-name">Digital design</span>
+                    <span class="cat-count"></span>
+                    <span class="tick" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="projects" id="p-ml">
             <details open>
                 <summary>
                     <div class="title">
@@ -225,30 +262,27 @@
                     <p class="stack">Python, NumPy, JavaScript · <a href="https://blappay1721.github.io/MNIST-NN-Classifier/">Live demo</a> · <a href="https://github.com/blappay1721/MNIST-NN-Classifier">Code</a></p>
                 </div>
             </details>
-        </div>
-    </section>
-
-    <section>
-        <h2>Systems and servers</h2>
-        <div class="projects">
+            </div>
+            <div class="projects" id="p-sys">
             <details>
                 <summary>
                     <div class="title">
                         <h3>Self-hosted game server infrastructure</h3>
                         <p class="sub">Multi-server network on a headless Ubuntu homelab</p>
                     </div>
-                    <div class="result"><b>~55</b><small>plugins in production</small></div>
+                    <div class="result"><b>30+</b><small>unique users</small></div>
                     <span class="toggle" aria-hidden="true"></span>
                 </summary>
                 <div class="body">
                     <ul>
-                        <li>Several Paper backends behind a Velocity proxy, managed with Pterodactyl/Wings in Docker.</li>
+                        <li>Several Paper backends behind a Velocity proxy, managed with tmux.</li>
                         <li>Firewall and intrusion prevention with ufw and fail2ban: rate-limited SSH, an admin-only panel port, and a custom jail whose filter I rewrote to catch slow read-timeout bot scanners. Checked reachability end to end with ss, tcpdump and external probes.</li>
                         <li>Traced recurring NVMe timeouts, controller resets and a watchdog crash to a firmware power-state (APST) bug and fixed it with a kernel boot parameter.</li>
                         <li>Traced mass player disconnects to Wi-Fi power management and mesh roaming, and made the fix persistent in NetworkManager.</li>
                         <li>Moved large data sets to secondary storage with copy, checksum dry-run, delete, then symlink, on UUID-based mounts.</li>
+                        <li>Set up Pi-hole for network-level ad-block for over a dozen devices on my home network.</li>
                     </ul>
-                    <p class="stack">Ubuntu Server, Docker, Pterodactyl, ufw, fail2ban, iptables, Pi-hole, tmux, PM2</p>
+                    <p class="stack">Ubuntu Server, ufw, fail2ban, iptables, tmux, PM2</p>
                 </div>
             </details>
             <details>
@@ -302,12 +336,8 @@
                     <p class="stack">Java 21, Maven, Paper API, DiscordSRV · <a href="https://github.com/blappay1721/AwesomeChat-DiscordSRV-Addon">Code</a></p>
                 </div>
             </details>
-        </div>
-    </section>
-
-    <section>
-        <h2>Digital design</h2>
-        <div class="projects">
+            </div>
+            <div class="projects" id="p-hw">
             <details>
                 <summary>
                     <div class="title">
@@ -357,6 +387,7 @@
                     <p class="stack">SystemVerilog, ModelSim · <a href="https://github.com/blappay1721/alarm-clock-sv">Code</a></p>
                 </div>
             </details>
+            </div>
         </div>
     </section>
 
@@ -379,8 +410,8 @@
         <h2>Skills</h2>
         <div class="skills">
             <div><h3>Languages</h3><p>Java and Python (4 years), C, JavaScript, MATLAB, Bash, SystemVerilog, MIPS assembly, C++, HTML/CSS</p></div>
-            <div><h3>ML and inference</h3><p>vLLM, Hugging Face, LoRA (SFT, DPO), RAG, Ollama, NumPy, RunPod</p></div>
-            <div><h3>Linux and DevOps</h3><p>Ubuntu Server, Docker, Pterodactyl, systemd, NetworkManager, LVM, rsync, tmux, PM2</p></div>
+            <div><h3>ML and inference</h3><p>Claude Code, vLLM, Hugging Face, LoRA (SFT, DPO), RAG, Ollama, NumPy, RunPod</p></div>
+            <div><h3>Linux and DevOps</h3><p>Ubuntu Server, systemd, NetworkManager, LVM, rsync, tmux, PM2</p></div>
             <div><h3>Networking and security</h3><p>ufw, fail2ban, iptables, tcpdump, ss, Pi-hole/DNS, SSH/SFTP</p></div>
             <div><h3>Server development</h3><p>Java 21, Maven, Paper API, Velocity, JVM stack-trace debugging</p></div>
             <div><h3>Tools</h3><p>Git, Vim, VS Code Remote, ModelSim, LaTeX</p></div>
@@ -465,6 +496,45 @@
     addEventListener('resize', resize);
 
     readColors(); resize(); tick();
+})();
+</script>
+<script>
+// Project category cards: each cycles through its projects' headline results and toggles its list.
+(() => {
+    const still = matchMedia('(prefers-reduced-motion: reduce)');
+    const cats = [...document.querySelectorAll('.cat')];
+    const panelOf = b => document.getElementById(b.getAttribute('aria-controls'));
+    cats.forEach((btn, n) => {
+        const panel = panelOf(btn), tick = btn.querySelector('.tick');
+        const items = [...panel.querySelectorAll('summary')].map(s => ({
+            num: s.querySelector('.result b')?.textContent ?? '',
+            unit: s.querySelector('.result small')?.textContent ?? '',
+            title: s.querySelector('h3').textContent
+        }));
+        let i = 0, paused = false;
+        const show = () => {
+            const it = items[i];
+            tick.replaceChildren(...[['b', it.num], ['small', it.unit], ['span', it.title]]
+                .filter(([, t]) => t).map(([tag, t]) => Object.assign(document.createElement(tag), { textContent: t })));
+        };
+        btn.querySelector('.cat-count').textContent = items.length + ' projects';
+        panel.hidden = true;
+        show();
+        btn.addEventListener('pointerenter', () => paused = true);
+        btn.addEventListener('pointerleave', () => paused = false);
+        // Stagger the cards so they don't all flip at once
+        setTimeout(() => setInterval(() => {
+            if (paused || still.matches) return;
+            tick.classList.add('fade');
+            setTimeout(() => { i = (i + 1) % items.length; show(); tick.classList.remove('fade'); }, 300);
+        }, 3600), n * 1200);
+        btn.addEventListener('click', () => {
+            const opening = btn.getAttribute('aria-expanded') !== 'true';
+            cats.forEach(b => { b.setAttribute('aria-expanded', 'false'); panelOf(b).hidden = true; });
+            btn.setAttribute('aria-expanded', opening);
+            panel.hidden = !opening;
+        });
+    });
 })();
 </script>
 </body>
