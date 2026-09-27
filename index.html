@@ -11,12 +11,12 @@
     <meta property="og:type" content="website">
     <meta name="theme-color" content="#2446d8">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="canonical" href="https://blappay1721.github.io/">
+    <link rel="preload" href="fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <header class="hero">
     <canvas id="field" aria-hidden="true"></canvas>
     <div class="hero-inner">
@@ -29,7 +29,7 @@
     </div>
 </header>
 
-<main class="wrap">
+<main class="wrap" id="main">
     <section>
         <h2>Experience</h2>
         <div>
@@ -56,6 +56,9 @@
     <section>
         <h2>Projects</h2>
         <div>
+            <div class="cats-bar">
+                <button class="pause" type="button" aria-pressed="false">Pause rotation</button>
+            </div>
             <div class="cats">
                 <button class="cat" type="button" aria-expanded="false" aria-controls="p-ml">
                     <span class="cat-name">Machine learning</span>
@@ -316,6 +319,11 @@
         <div class="contact">
             <a href="mailto:blappay1721@gmail.com">blappay1721@gmail.com</a>
             <a href="https://github.com/blappay1721">GitHub</a>
+        </div>
+        <div class="fine">
+            <p><b>Privacy.</b> This site sets no cookies, runs no analytics or trackers, and loads nothing from third parties. It's hosted on GitHub Pages, which keeps its own <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">server logs</a>.</p>
+            <p><b>Accessibility.</b> This site aims to meet WCAG 2.2 AA. It works with a keyboard and screen readers, follows your system's light or dark theme, and tones down motion if you've turned on reduced motion. Found something that doesn't work for you? <a href="mailto:blappay1721@gmail.com?subject=Accessibility%20issue">Let me know</a>.</p>
+            <p>© 2026 Bernard Lappay</p>
         </div>
     </footer>
 </main>

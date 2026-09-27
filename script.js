@@ -68,11 +68,37 @@
     readColors(); resize(); tick();
 })();
 
+// Count a figure up from zero, keeping its prefix, suffix, commas and decimals ("−86%", "16,384", "95.4%").
+const still = matchMedia('(prefers-reduced-motion: reduce)');
+function countUp(el) {
+    const text = el.dataset.final ??= el.textContent;
+    const m = text.match(/\d[\d,]*(\.\d+)?/);
+    if (!m || still.matches) return;
+    const target = parseFloat(m[0].replaceAll(',', '')), places = m[1] ? m[1].length - 1 : 0;
+    const fmt = v => text.replace(m[0], v.toLocaleString('en-US', { minimumFractionDigits: places, maximumFractionDigits: places }));
+    const start = performance.now(), dur = 900;
+    const step = now => {
+        const t = Math.min((now - start) / dur, 1);
+        el.textContent = fmt(target * (1 - (1 - t) ** 3));
+        if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+}
+// Page figures count up each time they scroll (or open) into view
+const counter = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && countUp(e.target)), { threshold: 0.6 });
+document.querySelectorAll('.result b').forEach(b => counter.observe(b));
+
 // Project category cards: each cycles through its projects' headline results and toggles its list.
 (() => {
-    const still = matchMedia('(prefers-reduced-motion: reduce)');
     const cats = [...document.querySelectorAll('.cat')];
     const panelOf = b => document.getElementById(b.getAttribute('aria-controls'));
+    const pause = document.querySelector('.pause');
+    pause.addEventListener('click', () => {
+        const on = pause.getAttribute('aria-pressed') !== 'true';
+        pause.setAttribute('aria-pressed', on);
+        pause.textContent = on ? 'Resume rotation' : 'Pause rotation';
+        cats[0].parentElement.classList.toggle('paused', on);
+    });
     cats.forEach((btn, n) => {
         const panel = panelOf(btn), tick = btn.querySelector('.tick'), pie = btn.querySelector('.pie');
         const items = [...panel.querySelectorAll('summary')].map(s => ({
@@ -85,6 +111,8 @@
             const it = items[i];
             tick.replaceChildren(...[['span', it.title], ['b', it.num], ['small', it.unit]]
                 .filter(([, t]) => t).map(([tag, t]) => Object.assign(document.createElement(tag), { textContent: t })));
+            const num = tick.querySelector('b');
+            if (num) countUp(num);
         };
         btn.querySelector('.cat-count').textContent = items.length + ' projects';
         panel.hidden = true;
