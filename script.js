@@ -144,17 +144,15 @@ document.querySelectorAll('.result b').forEach(b => counter.observe(b));
 // Email: clicking copies the address
 document.querySelectorAll('.email').forEach(btn => {
     const note = btn.querySelector('small');
-    const label = matchMedia('(hover: none)').matches ? 'Tap to copy' : 'Click to copy';
-    note.textContent = label;
     btn.addEventListener('click', async () => {
         try {
             await navigator.clipboard.writeText(btn.dataset.email);
             note.textContent = 'Copied ✓';
         } catch {
-            getSelection().selectAllChildren(btn.querySelector('span'));
-            note.textContent = 'Press Ctrl+C to copy';
+            getSelection().selectAllChildren(btn);
+            note.textContent = 'Press Ctrl+C';
         }
         clearTimeout(btn.reset);
-        btn.reset = setTimeout(() => note.textContent = label, 2000);
+        btn.reset = setTimeout(() => note.textContent = 'Copy', 2000);
     });
 });
