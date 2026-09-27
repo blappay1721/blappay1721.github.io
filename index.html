@@ -3,9 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page</title>
+    <title>Bernard Lappay</title>
+    <meta name="description" content="Bernard Lappay, Computer Engineering student at UC San Diego. Machine learning, LLM inference, and backend systems for live multiplayer games.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #e9edf3; --ink: #14213d; --soft: #52607a; --rule: #c9d1de;
+            --cobalt: #2446d8; --amber: #d98a1c;
+            /* Voronoi field colors, read by the canvas script */
+            --cell-a: #e2e7ef; --cell-b: #f1f4f8; --edge: #c3ccdb; --probe: #cdd6f7;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --paper: #0f1830; --ink: #e6eaf2; --soft: #97a3bb; --rule: #26345a;
+                --cobalt: #7d97ff; --amber: #f2b45a;
+                --cell-a: #0f1830; --cell-b: #16213f; --edge: #26345a; --probe: #1f3170;
+            }
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+        body {
+            margin: 0; background: var(--paper); color: var(--ink);
+            font: 400 17px/1.6 "Schibsted Grotesk", system-ui, sans-serif;
+        }
+        a { color: var(--cobalt); text-underline-offset: 3px; }
+        a:focus-visible, summary:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 4px; border-radius: 2px; }
+
+        /* Hero: live nearest-neighbor field */
+        .hero { position: relative; min-height: 100svh; display: grid; align-items: end; overflow: hidden; }
+        #field { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+        .hero-inner { position: relative; width: min(1120px, 100%); margin: 0 auto; padding: 0 24px 9vh; pointer-events: none; }
+        .hero-inner a { pointer-events: auto; }
+        h1 {
+            font-weight: 900; font-size: clamp(3.2rem, 11vw, 9rem); line-height: 0.88;
+            letter-spacing: -0.045em; margin: 0 0 28px;
+        }
+        .lede { font-size: clamp(1.15rem, 2vw, 1.45rem); line-height: 1.4; max-width: 30ch; margin: 0 0 28px; font-weight: 500; }
+        .contact { display: flex; gap: 12px; flex-wrap: wrap; }
+        .contact a {
+            background: var(--ink); color: var(--paper); text-decoration: none; font-weight: 500;
+            padding: 10px 18px; border-radius: 999px;
+        }
+        .contact a + a { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+        .caption { position: absolute; right: 24px; bottom: 24px; max-width: 30ch; font-size: 0.85rem; color: var(--soft); text-align: right; margin: 0; }
+
+        /* Body sections */
+        .wrap { width: min(1120px, 100%); margin: 0 auto; padding: 0 24px; }
+        section { padding: 96px 0 0; display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 24px 48px; }
+        h2 { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
+        h3 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; margin: 0; line-height: 1.25; }
+        .sub { color: var(--soft); margin: 4px 0 0; }
+        ul { margin: 16px 0 0; padding-left: 1.1em; max-width: 68ch; }
+        li { margin-bottom: 8px; overflow-wrap: anywhere; }
+        li::marker { color: var(--cobalt); }
+
+        /* Result figures: the one number each piece of work is judged by */
+        .result { text-align: right; flex-shrink: 0; }
+        .result b { display: block; font-size: 2.6rem; font-weight: 900; letter-spacing: -0.04em; line-height: 1; color: var(--cobalt); }
+        .result small { color: var(--soft); font-size: 0.85rem; }
+
+        .job { display: flex; justify-content: space-between; gap: 24px; }
+        .stack { color: var(--soft); font-size: 0.95rem; margin: 16px 0 0; }
+
+        /* Projects: expandable rows */
+        .projects { border-top: 2px solid var(--ink); }
+        details { border-bottom: 1px solid var(--rule); }
+        summary {
+            list-style: none; cursor: pointer; display: flex; align-items: center; gap: 24px;
+            padding: 28px 0;
+        }
+        summary::-webkit-details-marker { display: none; }
+        summary .title { flex: 1; }
+        .toggle {
+            width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%;
+            box-shadow: inset 0 0 0 1.5px var(--rule); position: relative; transition: transform .25s ease, background .2s;
+        }
+        .toggle::before, .toggle::after {
+            content: ""; position: absolute; left: 50%; top: 50%; width: 12px; height: 2px;
+            background: var(--ink); translate: -50% -50%;
+        }
+        .toggle::after { rotate: 90deg; }
+        details[open] .toggle { transform: rotate(45deg); background: var(--cell-b); }
+        summary:hover h3 { color: var(--cobalt); }
+        .body { padding: 0 0 32px; }
+        .body ul { margin-top: 0; }
+        details::details-content { height: 0; overflow: clip; transition: height .3s ease, content-visibility .3s allow-discrete; }
+        details[open]::details-content { height: auto; }
+        :root { interpolate-size: allow-keywords; }
+        @media (prefers-reduced-motion: reduce) { details::details-content, .toggle { transition: none; } }
+
+        .skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+        .skills h3 { font-size: 1rem; margin-bottom: 6px; }
+        .skills p { margin: 0; color: var(--soft); }
+
+        footer { padding: 120px 0 48px; }
+        footer p { font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.15; margin: 0 0 24px; max-width: 20ch; }
+
+        @media (max-width: 760px) {
+            section { grid-template-columns: minmax(0, 1fr); padding-top: 72px; }
+            .job { flex-direction: column; }
+            .result { text-align: left; }
+            summary { flex-wrap: wrap; gap: 12px 16px; }
+            summary .result { order: 3; width: 100%; }
+            .caption { display: none; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to My Site</h1>
+<header class="hero">
+    <canvas id="field" aria-hidden="true"></canvas>
+    <div class="hero-inner">
+        <h1>Bernard<br>Lappay</h1>
+        <p class="lede">Computer engineering student at UC San Diego, building ML pipelines and the backends behind live multiplayer games.</p>
+        <div class="contact">
+            <a href="mailto:blappay1721@gmail.com">Email me</a>
+            <a href="https://github.com/blappay1721">GitHub</a>
+        </div>
+    </div>
+    <p class="caption">Each cell is the region nearest one point, the idea behind my digit classifier. Move your cursor to add a point.</p>
+</header>
+
+<main class="wrap">
+    <section>
+        <h2>Experience</h2>
+        <div>
+            <div class="job">
+                <div>
+                    <h3>Technical Contributor, Silent Studios</h3>
+                    <p class="sub">Mineshoku Tensei, a live-service multiplayer game. Remote, June 2026 to present.</p>
+                </div>
+                <div class="result"><b>−86%</b><small>data complexity in a core<br>spatial-query system</small></div>
+            </div>
+            <ul>
+                <li>Architected and maintain backend infrastructure across multiple server instances, keeping data consistent and reliable at scale.</li>
+                <li>Traced a spatial-query bottleneck in a core gameplay system and fixed it with a custom Python tool built on a computational-geometry simplification algorithm.</li>
+                <li>Designed real-time boss encounters with multi-stage attacks driven by timing-based state machines that prevent race conditions.</li>
+                <li>Hardened public-facing infrastructure against abuse and unauthorized access.</li>
+                <li>Lead ongoing performance and compatibility work across a large stack of interoperating systems.</li>
+            </ul>
+            <p class="stack">Python, Linux administration, PM2, SSH/SFTP</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Projects</h2>
+        <div class="projects">
+            <details open>
+                <summary>
+                    <div class="title">
+                        <h3>Adaptive math-reasoning inference pipeline</h3>
+                        <p class="sub">LLM inference for a class Kaggle competition, ranked #29</p>
+                    </div>
+                    <div class="result"><b>68/100</b><small>up from 61 single-pass</small></div>
+                    <span class="toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="body">
+                    <ul>
+                        <li>Made a fixed 4B model (Qwen3-4B-Thinking-2507) more reliable at math without changing its weights for the main path.</li>
+                        <li>Verifier-guided majority vote: three candidates per problem, two must agree. Failures retry with a larger token budget, re-prompted with prior attempts and verifier feedback.</li>
+                        <li>Audited and cleaned 7,500 distilled examples, trained LoRA SFT and DPO adapters, and used the adapter only as a targeted fallback.</li>
+                        <li>Multiple-choice accuracy rose from 73.6% to 81.6%. Batched inference ran on vLLM on an H100.</li>
+                    </ul>
+                    <p class="stack">Python, vLLM, Hugging Face, LoRA, DPO, RunPod</p>
+                </div>
+            </details>
+            <details>
+                <summary>
+                    <div class="title">
+                        <h3>Movie recommendation system</h3>
+                        <p class="sub">Probabilistic model trained on incomplete ratings</p>
+                    </div>
+                    <div class="result"><b>80%</b><small>accuracy on seen ratings</small></div>
+                    <span class="toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="body">
+                    <ul>
+                        <li>Naive Bayes recommender trained with Expectation–Maximization on partially observed binary ratings, with stable likelihood convergence.</li>
+                        <li>300 users and 60 movies: 10,444 observed ratings, 6,836 estimated.</li>
+                        <li>Produces personalized predictions for every user's unseen movies.</li>
+                    </ul>
+                    <p class="stack">Python, NumPy</p>
+                </div>
+            </details>
+            <details>
+                <summary>
+                    <div class="title">
+                        <h3>Handwritten digit recognition</h3>
+                        <p class="sub">Nearest-neighbor classifier on MNIST</p>
+                    </div>
+                    <div class="result"><b>95%+</b><small>on 1,000 test digits</small></div>
+                    <span class="toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="body">
+                    <ul>
+                        <li>1-NN classifier over a 7,500-image training set.</li>
+                        <li>Vectorized batch prediction and confusion-matrix evaluation to see which digits get mistaken for which.</li>
+                    </ul>
+                    <p class="stack">Python, NumPy</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <section>
+        <h2>Education</h2>
+        <div>
+            <h3>B.S. Computer Engineering, UC San Diego</h3>
+            <p class="sub">Expected June 2027</p>
+            <ul>
+                <li>Probabilistic Models in AI and ML: Learning Algorithms</li>
+                <li>Computer Design and Architecture (Verilog, C, Assembly)</li>
+                <li>Object-Oriented Programming and Data Structures (Java)</li>
+                <li>Probability and Statistics for Engineers (MATLAB, Python)</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>Skills</h2>
+        <div class="skills">
+            <div><h3>Languages</h3><p>Java and Python (4 years), C, MATLAB, Bash, JavaScript, Assembly, Verilog</p></div>
+            <div><h3>ML and inference</h3><p>vLLM, Hugging Face, Ollama, RunPod, NumPy</p></div>
+            <div><h3>Systems and tools</h3><p>Linux, Git, SSH/SFTP, PM2, Maven, Vim, VS Code, HTML/CSS</p></div>
+        </div>
+    </section>
+
+    <footer>
+        <p>Looking for internships in ML and systems engineering.</p>
+        <div class="contact">
+            <a href="mailto:blappay1721@gmail.com">blappay1721@gmail.com</a>
+            <a href="https://github.com/blappay1721">GitHub</a>
+        </div>
+    </footer>
+</main>
+
+<script>
+// Voronoi field: each low-res cell takes the color of its nearest seed; near-ties draw the edges.
+(() => {
+    const canvas = document.getElementById('field');
+    const ctx = canvas.getContext('2d');
+    const hero = canvas.parentElement;
+    const CELL = 8;
+    const still = matchMedia('(prefers-reduced-motion: reduce)');
+    const dark = matchMedia('(prefers-color-scheme: dark)');
+    let w, h, img, colors, probe = null, visible = true;
+    const seeds = Array.from({ length: 16 }, () => ({
+        x: Math.random(), y: Math.random(),
+        vx: (Math.random() - .5) * .0004, vy: (Math.random() - .5) * .0004,
+        t: Math.random()
+    }));
+
+    const hex = s => { const n = parseInt(s.trim().slice(1), 16); return [n >> 16, n >> 8 & 255, n & 255]; };
+    function readColors() {
+        const cs = getComputedStyle(document.documentElement);
+        colors = ['--cell-a', '--cell-b', '--edge', '--probe'].map(v => hex(cs.getPropertyValue(v)));
+    }
+    function resize() {
+        w = Math.ceil(hero.clientWidth / CELL); h = Math.ceil(hero.clientHeight / CELL);
+        canvas.width = w; canvas.height = h;
+        img = ctx.createImageData(w, h);
+        draw();
+    }
+    function draw() {
+        const [a, b, edge, pc] = colors, d = img.data;
+        const pts = seeds.map(s => [s.x * w, s.y * h, s.t]);
+        if (probe) pts.push([probe[0] * w, probe[1] * h, -1]);
+        // ponytail: brute-force nearest seed per cell, O(cells × seeds); fine at 8px cells and 17 seeds
+        for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i += 4) {
+            let d1 = Infinity, d2 = Infinity, k = 0;
+            for (let j = 0; j < pts.length; j++) {
+                const dx = pts[j][0] - x, dy = pts[j][1] - y, dd = dx * dx + dy * dy;
+                if (dd < d1) { d2 = d1; d1 = dd; k = j; } else if (dd < d2) d2 = dd;
+            }
+            const t = pts[k][2];
+            const c = Math.sqrt(d2) - Math.sqrt(d1) < 1 ? edge
+                : t < 0 ? pc
+                : [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+            d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = 255;
+        }
+        ctx.putImageData(img, 0, 0);
+    }
+    function tick() {
+        if (visible && !still.matches) {
+            for (const s of seeds) {
+                s.x += s.vx; s.y += s.vy;
+                if (s.x < 0 || s.x > 1) s.vx *= -1;
+                if (s.y < 0 || s.y > 1) s.vy *= -1;
+            }
+            draw();
+        }
+        requestAnimationFrame(tick);
+    }
+
+    hero.addEventListener('pointermove', e => {
+        const r = hero.getBoundingClientRect();
+        probe = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
+        if (still.matches) draw();
+    });
+    hero.addEventListener('pointerleave', () => { probe = null; draw(); });
+    new IntersectionObserver(([e]) => visible = e.isIntersecting).observe(hero);
+    dark.addEventListener('change', () => { readColors(); draw(); });
+    addEventListener('resize', resize);
+
+    readColors(); resize(); tick();
+})();
+</script>
 </body>
 </html>
