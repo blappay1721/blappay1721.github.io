@@ -36,10 +36,12 @@
         <h1>Bernard<br>Lappay</h1>
         <p class="lede">Computer engineering student at UC San Diego.</p>
         <div class="contact">
-            <a href="mailto:blappay1721@gmail.com">Email me</a>
-            <a href="https://github.com/blappay1721" rel="me">GitHub</a>
-            <a href="https://www.linkedin.com/in/blappay1721" rel="me">LinkedIn</a>
+            <a href="https://github.com/blappay1721" rel="me noopener" target="_blank">GitHub</a>
+            <a href="https://www.linkedin.com/in/blappay1721" rel="me noopener" target="_blank">LinkedIn</a>
         </div>
+        <button class="email" type="button" data-email="blappay1721@gmail.com" title="Copy email address">
+            <span>blappay1721@gmail.com</span><small aria-live="polite">Click to copy</small>
+        </button>
     </div>
 </header>
 
@@ -49,8 +51,8 @@
         <div>
             <div class="job">
                 <div>
-                    <h3>Technical Contributor, <a href="https://silent-studio.net/">Silent Studios</a></h3>
-                    <p class="sub"><a href="https://mineshokutensei.com/">Mineshoku Tensei</a>, a live-service multiplayer game. Remote, June 2026 to present.</p>
+                    <h3>Technical Contributor, <a href="https://silent-studio.net/" target="_blank" rel="noopener">Silent Studios</a></h3>
+                    <p class="sub"><a href="https://mineshokutensei.com/" target="_blank" rel="noopener">Mineshoku Tensei</a>, a live-service multiplayer game. Remote, June 2026 to present.</p>
                 </div>
                 <div class="result"><b>−86%</b><small>data complexity in a core<br>spatial-query system</small></div>
             </div>
@@ -113,7 +115,7 @@
                         <li>Audited and repaired 7,500 distilled examples and trained LoRA SFT and DPO adapters. Noisy data first cut accuracy (61 to 58); the cleaned adapter still didn't beat the base model overall, so it runs only as a fallback on unresolved multiple-choice questions, where it helps.</li>
                         <li>Checkpointed, resumable batch inference with vLLM on rented H100s. In an early milestone run, voting and retries lifted multiple-choice accuracy from 73.6% to 81.6%.</li>
                     </ul>
-                    <p class="stack">Python, vLLM, Hugging Face, LoRA, DPO, RunPod · <a href="https://github.com/blappay1721/151B_SP26_Competition">Code</a></p>
+                    <p class="stack">Python, vLLM, Hugging Face, LoRA, DPO, RunPod · <a href="https://github.com/blappay1721/151B_SP26_Competition" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             <details>
@@ -131,7 +133,7 @@
                         <li>Dual-index RAG: separate indexes for persona style and topical facts, so style fidelity and factual accuracy don't trade off.</li>
                         <li>Slash commands with channel-scoped responses, AI chat through Ollama, and vote-gated group commands, served by Express behind a Cloudflare tunnel.</li>
                     </ul>
-                    <p class="stack">Node.js, discord.js, Express, Ollama, Cloudflare Tunnel · <a href="https://github.com/blappay1721/bruh">Code</a></p>
+                    <p class="stack">Node.js, discord.js, Express, Ollama, Cloudflare Tunnel · <a href="https://github.com/blappay1721/bruh" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             <details>
@@ -140,7 +142,7 @@
                         <h3>Movie recommender with EM</h3>
                         <p class="sub">Latent-class model trained on incomplete ratings</p>
                     </div>
-                    <div class="result"><b>40%</b><small>of ratings missing</small></div>
+                    <div class="result"><b>4</b><small>taste groups found<br>from survey answers</small></div>
                     <span class="toggle" aria-hidden="true"></span>
                 </summary>
                 <div class="body">
@@ -149,7 +151,7 @@
                         <li>Vectorized EM in log space with log-sum-exp for stability. Log-likelihood never decreases and converges to the course reference value to four decimal places.</li>
                         <li>Interactive survey: rate the movies you've seen and it infers your type mix and ranks the ones you haven't.</li>
                     </ul>
-                    <p class="stack">Python, NumPy, ipywidgets · <a href="https://github.com/blappay1721/EM-Movie-Recommender">Code</a></p>
+                    <p class="stack">Python, NumPy, ipywidgets · <a href="https://github.com/blappay1721/EM-Movie-Recommender" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             <details>
@@ -167,7 +169,7 @@
                         <li>Confusion matrix and misclassified examples shown next to the training images they matched.</li>
                         <li>Browser demo runs the same search in JavaScript: draw a digit and see its five nearest training images.</li>
                     </ul>
-                    <p class="stack">Python, NumPy, JavaScript · <a href="https://blappay1721.github.io/MNIST-NN-Classifier/">Live demo</a> · <a href="https://github.com/blappay1721/MNIST-NN-Classifier">Code</a></p>
+                    <p class="stack">Python, NumPy, JavaScript · <a href="https://blappay1721.github.io/MNIST-NN-Classifier/" target="_blank" rel="noopener">Live demo</a> · <a href="https://github.com/blappay1721/MNIST-NN-Classifier" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             </div>
@@ -208,7 +210,7 @@
                         <li>Raises Bukkit's attribute limits through reflection into the server's attribute registry, falling back to summing modifiers by hand if a future build breaks it.</li>
                         <li>Fixed a bug where a deprecated damage-modifier API double-applied armor and turned hits into healing. The damage formula is checked with Python unit tests.</li>
                     </ul>
-                    <p class="stack">Java 21, Maven, Paper API · <a href="https://github.com/blappay1721/UncapDefense">Code</a></p>
+                    <p class="stack">Java 21, Maven, Paper API · <a href="https://github.com/blappay1721/UncapDefense" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             <details>
@@ -226,7 +228,7 @@
                         <li>Uses CoreProtect's block log as the source of truth, with a 10-second in-memory cache covering its async write delay.</li>
                         <li>Running live on three servers. Overlapping regions apply the strictest cutoff. Admin commands arm, add and remove regions with tab completion.</li>
                     </ul>
-                    <p class="stack">Java 21, Maven, Paper API, WorldGuard, CoreProtect · <a href="https://github.com/blappay1721/placedonlybreak">Code</a></p>
+                    <p class="stack">Java 21, Maven, Paper API, WorldGuard, CoreProtect · <a href="https://github.com/blappay1721/placedonlybreak" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             <details>
@@ -244,7 +246,7 @@
                         <li>Trigger syntax and permissions come straight from the host chat plugin's config, so the two can never disagree.</li>
                         <li>One small version-specific module per Minecraft release, 24 in all from 1.19 up, loaded by reflection at startup. Dropped the 19 legacy modules, proxy support and bundled libraries the new host didn't need.</li>
                     </ul>
-                    <p class="stack">Java 21, Maven, Paper API, DiscordSRV · <a href="https://github.com/blappay1721/AwesomeChat-DiscordSRV-Addon">Code</a></p>
+                    <p class="stack">Java 21, Maven, Paper API, DiscordSRV · <a href="https://github.com/blappay1721/AwesomeChat-DiscordSRV-Addon" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             </div>
@@ -263,7 +265,7 @@
                         <li>Parameterized two's-complement multiplier split into a datapath and a control unit driven by an 18-word microcode ROM with conditional branches on datapath flags.</li>
                         <li>Self-checking testbench runs directed cases, then every 7-bit signed operand pair.</li>
                     </ul>
-                    <p class="stack">SystemVerilog, ModelSim · <a href="https://github.com/blappay1721/robertsons-multiplier-sv">Code</a></p>
+                    <p class="stack">SystemVerilog, ModelSim · <a href="https://github.com/blappay1721/robertsons-multiplier-sv" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             <details>
@@ -280,7 +282,7 @@
                         <li>A 6-bit LFSR with loadable taps and seed generates the keystream. A control sequencer loads its configuration from memory, writes a scrambled preamble, then encrypts the message.</li>
                         <li>Self-checking testbench computes the same encryption in software and compares byte by byte.</li>
                     </ul>
-                    <p class="stack">SystemVerilog, ModelSim · <a href="https://github.com/blappay1721/lfsr-encryptor-sv">Code</a></p>
+                    <p class="stack">SystemVerilog, ModelSim · <a href="https://github.com/blappay1721/lfsr-encryptor-sv" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             <details>
@@ -297,7 +299,7 @@
                         <li>Every counter is one reusable modulo-N module, chained by carry signals, and drives 7-segment displays through binary-to-BCD conversion.</li>
                         <li>Adds day-of-week alarm suppression and correct month lengths with rollover. Testbenches print the displays as ASCII 7-segment digits.</li>
                     </ul>
-                    <p class="stack">SystemVerilog, ModelSim · <a href="https://github.com/blappay1721/alarm-clock-sv">Code</a></p>
+                    <p class="stack">SystemVerilog, ModelSim · <a href="https://github.com/blappay1721/alarm-clock-sv" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             </div>
@@ -334,13 +336,15 @@
     <footer>
         <p>Looking for internships in ML and systems engineering.</p>
         <div class="contact">
-            <a href="mailto:blappay1721@gmail.com">blappay1721@gmail.com</a>
-            <a href="https://github.com/blappay1721" rel="me">GitHub</a>
-            <a href="https://www.linkedin.com/in/blappay1721" rel="me">LinkedIn</a>
+            <a href="https://github.com/blappay1721" rel="me noopener" target="_blank">GitHub</a>
+            <a href="https://www.linkedin.com/in/blappay1721" rel="me noopener" target="_blank">LinkedIn</a>
         </div>
+        <button class="email" type="button" data-email="blappay1721@gmail.com" title="Copy email address">
+            <span>blappay1721@gmail.com</span><small aria-live="polite">Click to copy</small>
+        </button>
         <div class="fine">
-            <p><b>Privacy.</b> This site sets no cookies, runs no analytics or trackers, and loads nothing from third parties. It's hosted on GitHub Pages, which keeps its own <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">server logs</a>.</p>
-            <p><b>Accessibility.</b> This site aims to meet WCAG 2.2 AA. It works with a keyboard and screen readers, follows your system's light or dark theme, and tones down motion if you've turned on reduced motion. Found something that doesn't work for you? <a href="mailto:blappay1721@gmail.com?subject=Accessibility%20issue">Let me know</a>.</p>
+            <p><b>Privacy.</b> This site sets no cookies, runs no analytics or trackers, and loads nothing from third parties. It's hosted on GitHub Pages, which keeps its own <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">server logs</a>.</p>
+            <p><b>Accessibility.</b> This site aims to meet WCAG 2.2 AA. It works with a keyboard and screen readers, follows your system's light or dark theme, and tones down motion if you've turned on reduced motion. Found something that doesn't work for you? Email me at blappay1721@gmail.com.</p>
             <p>© 2026 Bernard Lappay</p>
         </div>
     </footer>

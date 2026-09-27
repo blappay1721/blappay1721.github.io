@@ -37,10 +37,20 @@ h1 {
 .lede { font-size: clamp(1.15rem, 2vw, 1.45rem); line-height: 1.4; max-width: 30ch; margin: 0 0 28px; font-weight: 500; }
 .contact { display: flex; gap: 12px; flex-wrap: wrap; }
 .contact a {
-    background: var(--ink); color: var(--paper); text-decoration: none; font-weight: 500;
-    padding: 10px 18px; border-radius: 999px;
+    color: var(--ink); text-decoration: none; font-weight: 500; padding: 10px 18px; border-radius: 999px;
+    box-shadow: inset 0 0 0 1.5px var(--ink); transition: background .2s, color .2s, box-shadow .2s;
 }
-.contact a + a { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.contact a:hover { background: #fff; color: #14213d; box-shadow: inset 0 0 0 1.5px #fff; }
+/* Email: shown in full, click copies it */
+.email {
+    font: inherit; color: var(--ink); background: none; border: 0; padding: 0; margin-top: 16px; cursor: copy;
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; text-align: left;
+}
+.email span { font-weight: 500; text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 4px; }
+.email:hover span { text-decoration-color: var(--cobalt); }
+.email small { color: var(--soft); font-size: 0.85rem; }
+.email:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 4px; border-radius: 2px; }
+.hero-inner .email { pointer-events: auto; }
 .caption { position: absolute; right: 24px; bottom: 24px; max-width: 30ch; font-size: 0.85rem; color: var(--soft); text-align: right; margin: 0; }
 
 /* Body sections */
@@ -114,13 +124,11 @@ details[open]::details-content { height: auto; }
     animation: sweep 8s linear infinite; transition: filter .2s;
 }
 .cat:hover .pie, .cat:focus-visible .pie, .cats.paused .pie { animation-play-state: paused; filter: grayscale(1) opacity(.55); }
-/* Hint line: on hover for mice, always shown on touch screens */
-.hint { margin-top: auto; padding-top: 12px; font-size: 0.85rem; font-weight: 500; color: var(--cobalt); opacity: 0; transition: opacity .2s; }
+/* Hint line: "Tap" on touch screens, "Click" elsewhere */
+.hint { margin-top: auto; padding-top: 12px; font-size: 0.85rem; font-weight: 500; color: var(--cobalt); }
 .hint::after { content: "Click to show projects ↓"; }
 .cat[aria-expanded="true"] .hint::after { content: "Click to hide ↑"; }
-.cat:hover .hint, .cat:focus-visible .hint { opacity: 1; }
 @media (hover: none) {
-    .hint { opacity: 1; }
     .hint::after { content: "Tap to show projects ↓"; }
     .cat[aria-expanded="true"] .hint::after { content: "Tap to hide ↑"; }
 }
