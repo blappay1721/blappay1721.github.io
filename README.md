@@ -9,7 +9,7 @@ Computer engineering student at **UC San Diego** (B.S. expected June 2027), work
 | Project | What it is | Result |
 |---|---|---|
 | [Math-reasoning inference pipeline](https://github.com/blappay1721/151B_SP26_Competition) | Verifier-guided voting, adaptive retries, and a LoRA fallback around a fixed 4B LLM | 68/100, ranked #29 in class Kaggle |
-| Persona chatbot | Stylometric analysis plus dual-index RAG for style-faithful Discord personas; runs on my [Discord bot platform](https://github.com/blappay1721/bruh) (persona code kept private since it's built on friends' messages) | 300k+ messages analyzed |
+| [Persona chatbot](https://github.com/blappay1721/bruh) | Stylometric analysis plus dual-index RAG for style-faithful Discord personas; runs on my Discord bot platform | 300k+ messages analyzed |
 | [MNIST nearest-neighbor classifier](https://github.com/blappay1721/MNIST-NN-Classifier) | 1-NN from scratch in NumPy, plus a [draw-a-digit demo](https://blappay1721.github.io/MNIST-NN-Classifier/) | 95.4% test accuracy |
 | [EM movie recommender](https://github.com/blappay1721/EM-Movie-Recommender) | Latent-class model trained with Expectation–Maximization on incomplete ratings | 288 survey responses modeled |
 | [UncapDefense](https://github.com/blappay1721/UncapDefense) | Paper plugin that lifts vanilla's armor damage-reduction cap | 80% ceiling removed |
