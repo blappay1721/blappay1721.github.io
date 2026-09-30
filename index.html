@@ -28,11 +28,23 @@
     </script>
     <link rel="canonical" href="https://blappay1721.github.io/">
     <link rel="preload" href="fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="styles.css?v=9">
+    <link rel="stylesheet" href="styles.css?v=12">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="hero">
+<nav class="nav" aria-label="Sections">
+    <div class="nav-inner">
+        <a class="nav-name" href="#top">Bernard Lappay</a>
+        <ul>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#education">Education</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </div>
+</nav>
+<header class="hero" id="top">
     <canvas id="field" aria-hidden="true"></canvas>
     <div class="hero-inner">
         <h1>Bernard<br>Lappay</h1>
@@ -47,8 +59,8 @@
 </header>
 
 <main class="wrap" id="main">
-    <section>
-        <h2>Experience</h2>
+    <section id="experience" aria-labelledby="h-experience">
+        <h2 id="h-experience">Experience</h2>
         <div>
             <div class="job">
                 <div>
@@ -70,8 +82,8 @@
         </div>
     </section>
 
-    <section>
-        <h2>Projects</h2>
+    <section id="projects" aria-labelledby="h-projects">
+        <h2 id="h-projects">Projects</h2>
         <div>
             <div class="cats-bar">
                 <button class="pause" type="button" aria-pressed="false">Pause rotation</button>
@@ -307,8 +319,8 @@
         </div>
     </section>
 
-    <section>
-        <h2>Education</h2>
+    <section id="education" aria-labelledby="h-education">
+        <h2 id="h-education">Education</h2>
         <div>
             <h3>B.S. Computer Engineering, UC San Diego</h3>
             <p class="sub">Expected June 2027</p>
@@ -322,8 +334,8 @@
         </div>
     </section>
 
-    <section>
-        <h2>Skills</h2>
+    <section id="skills" aria-labelledby="h-skills">
+        <h2 id="h-skills">Skills</h2>
         <div class="skills">
             <div><h3>Languages</h3><p>Java and Python (4 years), C, JavaScript, MATLAB, Bash, SystemVerilog, MIPS assembly, C++, HTML/CSS</p></div>
             <div><h3>AI/ML and inference</h3><p>Claude Code, vLLM, Hugging Face, LoRA (SFT, DPO), RAG, Ollama, NumPy, RunPod</p></div>
@@ -334,7 +346,7 @@
         </div>
     </section>
 
-    <footer>
+    <footer id="contact">
         <p>Looking for internships in ML and systems engineering.</p>
         <div class="contact">
             <a href="Bernard-Lappay-Resume.pdf" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm-1 1.8L18.2 9H13zM8 12.5h8V14H8zm0 3.5h8v1.5H8z"/></svg>Resume</a>
@@ -350,6 +362,6 @@
     </footer>
 </main>
 
-<script src="script.js?v=12"></script>
+<script src="script.js?v=15"></script>
 </body>
 </html>

@@ -16,7 +16,7 @@
     }
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body {
     margin: 0; background: var(--paper); color: var(--ink);
@@ -24,6 +24,48 @@ body {
 }
 a { color: var(--cobalt); text-underline-offset: 3px; }
 a:focus-visible, summary:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 4px; border-radius: 2px; }
+
+/* Nav: fixed bar, see-through over the hero, solid once scrolled */
+.nav {
+    position: fixed; inset: 0 0 auto; z-index: 5; transition: background .3s, box-shadow .3s;
+}
+.nav.solid {
+    background: color-mix(in srgb, var(--paper) 85%, transparent); box-shadow: 0 1px 0 var(--rule);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.nav-inner {
+    width: min(1120px, 100%); margin: 0 auto; padding: 0 24px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.nav a { color: var(--soft); text-decoration: none; font-weight: 500; font-size: 0.95rem; white-space: nowrap; transition: color .2s; }
+.nav a:hover, .nav a[aria-current] { color: var(--ink); }
+.nav .nav-name { color: var(--ink); font-weight: 700; transition: opacity .3s, visibility .3s; }
+.nav:not(.solid) .nav-name { opacity: 0; visibility: hidden; }  /* the hero already shows the name */
+.nav ul { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; max-width: none; }
+.nav li { margin: 0; }
+.nav li::before { content: none; }
+/* Current section: a short cobalt underline slides under its link */
+.nav ul a { position: relative; padding: 6px 0; }
+.nav ul a::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px;
+    background: var(--cobalt); transform: scaleX(0); transition: transform .3s cubic-bezier(.2,.7,.2,1);
+}
+.nav ul a[aria-current]::after { transform: none; }
+.nav a:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 4px; border-radius: 2px; }
+section:focus, footer:focus { outline: none; }
+@media (max-width: 640px) {
+    .nav .nav-name { display: none; }
+    .nav-inner { padding: 0; height: 48px; }
+    /* Links scroll sideways if they don't fit; edges fade to hint there's more */
+    .nav ul {
+        width: 100%; justify-content: space-between; gap: 10px; padding: 0 10px; overflow-x: auto; scrollbar-width: none;
+        -webkit-mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent);
+        mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent);
+    }
+    .nav ul::-webkit-scrollbar { display: none; }
+    /* Shrinks a little with the screen so all five links fit on phones 320px and up */
+    .nav a { font-size: clamp(0.8rem, 3.7vw, 0.95rem); }
+}
 
 /* Hero: live nearest-neighbor field */
 .hero { position: relative; min-height: 100svh; display: grid; align-items: end; overflow: hidden; }
@@ -178,7 +220,7 @@ footer { padding: 120px 0 48px; }
 .fine { margin-top: 72px; padding-top: 24px; border-top: 1px solid var(--rule); color: var(--soft); font-size: 0.85rem; max-width: 72ch; }
 footer .fine p { font-size: inherit; font-weight: 400; letter-spacing: 0; line-height: 1.6; max-width: none; margin: 0 0 8px; }
 .skip {
-    position: absolute; left: 16px; top: -48px; z-index: 10; padding: 8px 14px; border-radius: 999px;
+    position: fixed; left: 16px; top: -48px; z-index: 10; padding: 8px 14px; border-radius: 999px;
     background: var(--ink); color: var(--paper); text-decoration: none; font-weight: 500;
 }
 .skip:focus { top: 16px; }

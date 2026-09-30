@@ -109,28 +109,91 @@ document.querySelectorAll('.projects details').forEach(d => d.addEventListener('
     if (d.open) d.querySelectorAll('.body li, .body .stack').forEach((el, k) => rise(el, 60 + k * 70, -16, 0));
 }));
 
-// Bring a just-opened list into view, measured against the current window (no fixed sizes):
-// cards + list fit → keep both on screen, cards at the top; list fits alone → whole list, with as much
-// of the cards above it as there's room for; list taller than the window → its top. Already fully
-// visible → no scroll. Eased by hand because Chrome on Windows drops behavior:'smooth' entirely
-// when system animations are off; this is a short, user-triggered glide.
-function glideTo(head, el) {
-    const gap = 24, vh = innerHeight, top = head.getBoundingClientRect().top, r = el.getBoundingClientRect();
-    if (top >= 0 && r.bottom <= vh) return;
-    const mode = r.bottom - top + 2 * gap <= vh ? 0 : r.height + 2 * gap <= vh ? 1 : 2;
-    // Re-measured every frame: the cards' rotating text can change their height mid-glide
-    const target = () => {
-        const t = head.getBoundingClientRect().top, b = el.getBoundingClientRect();
-        return scrollY + [t - gap, b.bottom - vh + gap, b.top - gap][mode];
-    };
-    const from = scrollY, dur = Math.min(900, 300 + Math.abs(target() - from) / 3), start = performance.now();
+// Gentle eased scroll to wherever target() says, re-measured every frame so layout shifts mid-glide
+// (the cards' rotating text, fonts landing) don't make it miss. Hand-rolled because Chrome on
+// Windows drops behavior:'smooth' entirely when system animations are off; it's user-triggered.
+function glide(target) {
+    const from = scrollY, max = () => document.documentElement.scrollHeight - innerHeight;
+    const to = () => Math.max(0, Math.min(target(), max()));
+    const dist = Math.abs(to() - from);
+    if (dist < 8) return;  // already there; don't fidget
+    const dur = Math.min(1000, 350 + dist / 3), start = performance.now();
     const step = now => {
         const t = Math.min((now - start) / dur, 1);
-        scrollTo({ top: from + (target() - from) * (t < .5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2), behavior: 'instant' });
+        scrollTo({ top: from + (to() - from) * (t < .5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2), behavior: 'instant' });
         if (t < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
 }
+// Space the fixed nav bar covers, plus breathing room that grows with the window (no fixed sizes)
+const nav = document.querySelector('.nav');
+const margins = () => {
+    const room = Math.min(96, Math.max(24, innerHeight * .1));
+    return [nav.offsetHeight + room, room];
+};
+// Where to scroll so [top, bottom] sits comfortably on screen: the least movement that gets it
+// inside the margins, or, if it's too tall for that, its top just below the nav.
+function comfy(top, bottom) {
+    const [above, below] = margins(), vh = innerHeight;
+    if (bottom - top > vh - above - below) return scrollY + top - above;
+    return scrollY + (top < above ? top - above : bottom > vh - below ? bottom - vh + below : 0);
+}
+// A just-opened project list: fit the cards and the list together if they fit comfortably,
+// otherwise give the list the screen.
+function reveal(head, list) {
+    const [above, below] = margins();
+    const both = list.getBoundingClientRect().bottom - head.getBoundingClientRect().top <= innerHeight - above - below;
+    glide(() => {
+        const h = head.getBoundingClientRect(), l = list.getBoundingClientRect();
+        return both ? comfy(h.top, l.bottom) : comfy(l.top, l.bottom);
+    });
+}
+
+// Nav: section links glide there; the bar turns solid once past the top; the current section is marked
+const links = [...nav.querySelectorAll('a')];
+links.forEach(a => a.addEventListener('click', e => {
+    const el = document.querySelector(a.hash), heading = el.querySelector('h2, footer > p') ?? el;
+    e.preventDefault();
+    history.replaceState(null, '', a.hash === '#top' ? location.pathname : a.hash);
+    // Bring the section into focus: centered in the space below the bar if it fits comfortably,
+    // otherwise its heading just below the bar with the same breathing room as the cards
+    glide(() => {
+        if (a.hash === '#top') return 0;
+        const [above, below] = margins(), top = heading.getBoundingClientRect().top, h = el.getBoundingClientRect().bottom - top;
+        const space = innerHeight - above - below;
+        return scrollY + top - above - (h <= space ? (space - h) / 2 : 0);
+    });
+    pinned = a.hash === '#top' ? null : el;
+    markCurrent();
+    el.setAttribute('tabindex', '-1');
+    el.focus({ preventScroll: true });  // keyboard and screen readers continue from the section
+}));
+const solid = () => nav.classList.toggle('solid', scrollY > 8);
+addEventListener('scroll', solid, { passive: true });
+solid();
+// Current section: the last one whose heading has passed the middle of the screen (the last one
+// once the page bottoms out). A clicked link stays current until the visitor scrolls by hand,
+// since a short section near the end can't reach the middle.
+const sections = [...document.querySelectorAll('main section, footer')];
+let pinned = null, queued = false;
+function markCurrent() {
+    queued = false;
+    let cur = pinned;
+    if (!cur) {
+        const mid = (nav.offsetHeight + innerHeight) / 2;
+        if (scrollY >= document.documentElement.scrollHeight - innerHeight - 2) cur = sections.at(-1);
+        else for (const s of sections) if ((s.querySelector('h2, footer > p') ?? s).getBoundingClientRect().top <= mid) cur = s;
+    }
+    links.forEach(a => cur && a.hash === '#' + cur.id ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current'));
+}
+const queue = () => { if (!queued) { queued = true; requestAnimationFrame(markCurrent); } };
+addEventListener('scroll', queue, { passive: true });
+addEventListener('resize', queue);
+const unpin = () => { if (pinned) { pinned = null; queue(); } };
+addEventListener('wheel', unpin, { passive: true });
+addEventListener('touchstart', unpin, { passive: true });
+addEventListener('keydown', e => /^(Arrow(Up|Down)|Page(Up|Down)|Home|End| )$/.test(e.key) && unpin());
+markCurrent();
 
 // Project category cards: each cycles through its projects' headline results and toggles its list.
 (() => {
@@ -197,7 +260,7 @@ function glideTo(head, el) {
             btn.setAttribute('aria-expanded', opening);
             panel.hidden = !opening;
             if (!opening) return;
-            glideTo(cats[0].parentElement, panel);
+            reveal(cats[0].parentElement, panel);
             [...panel.children].forEach((el, k) => rise(el, k * 60));
         });
     });
