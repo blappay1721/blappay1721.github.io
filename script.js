@@ -88,6 +88,28 @@ function countUp(el) {
 const counter = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && countUp(e.target)), { threshold: 0.6 });
 document.querySelectorAll('.result b').forEach(b => counter.observe(b));
 
+// Subtle entrance: slide up a few px and fade in, staggered by delay
+function rise(el, delay = 0) {
+    if (still.matches) return;
+    el.animate([{ opacity: 0, transform: 'translateY(14px)' }, {}],
+        { duration: 500, delay, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+}
+// Page text and buttons rise in as they scroll into view; list items one after another
+const revealer = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    revealer.unobserve(e.target);
+    e.target.classList.remove('pre');
+    const sibs = e.target.parentElement.children;
+    rise(e.target, e.target.tagName === 'LI' ? [...sibs].indexOf(e.target) * 70 : 0);
+}), { threshold: 0.15 });
+if (!still.matches) document.querySelectorAll(
+    'section h2, .job, section > div > ul > li, section > div > .stack, .cats-bar, .cat, .skills > div, footer > p, footer .contact > *'
+).forEach(el => { el.classList.add('pre'); revealer.observe(el); });
+// Bullets fly in when a project opens
+document.querySelectorAll('.projects details').forEach(d => d.addEventListener('toggle', () => {
+    if (d.open) d.querySelectorAll('.body li, .body .stack').forEach((el, k) => rise(el, 80 + k * 70));
+}));
+
 // Project category cards: each cycles through its projects' headline results and toggles its list.
 (() => {
     const cats = [...document.querySelectorAll('.cat')];
@@ -102,6 +124,7 @@ document.querySelectorAll('.result b').forEach(b => counter.observe(b));
     cats.forEach((btn, n) => {
         const panel = panelOf(btn), tick = btn.querySelector('.tick'), pie = btn.querySelector('.pie');
         const items = [...panel.querySelectorAll('summary')].map(s => ({
+            details: s.parentElement,
             num: s.querySelector('.result b')?.textContent ?? '',
             unit: s.querySelector('.result small')?.textContent ?? '',
             title: s.querySelector('h3').textContent
@@ -137,6 +160,12 @@ document.querySelectorAll('.result b').forEach(b => counter.observe(b));
             cats.forEach(b => { b.setAttribute('aria-expanded', 'false'); panelOf(b).hidden = true; });
             btn.setAttribute('aria-expanded', opening);
             panel.hidden = !opening;
+            if (!opening) return;
+            // Open the project the card is showing, and bring it into view
+            const d = items[i].details;
+            d.open = true;
+            d.scrollIntoView({ behavior: still.matches ? 'auto' : 'smooth', block: 'start' });
+            [...panel.children].forEach((el, k) => rise(el, k * 60));
         });
     });
 })();

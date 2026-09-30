@@ -50,6 +50,18 @@ h1 {
 .ico { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
 .email span { min-width: 0; overflow-wrap: anywhere; text-align: left; }
 @media (prefers-reduced-motion: reduce) { .contact a, .email { transition: color .25s, box-shadow .25s; } }
+/* Hero text and buttons rise in on load */
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } }
+.hero-inner > *, .hero .contact > * { animation: rise .7s cubic-bezier(.2,.7,.2,1) backwards; }
+.lede { animation-delay: .12s; }
+.hero .contact > :nth-child(1) { animation-delay: .24s; }
+.hero .contact > :nth-child(2) { animation-delay: .3s; }
+.hero .contact > :nth-child(3) { animation-delay: .36s; }
+.hero .contact > :nth-child(4) { animation-delay: .42s; }
+.hero .contact { animation: none; }
+/* Hidden until scrolled into view (class set by script, so no-JS shows everything) */
+.pre { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .hero-inner > *, .hero .contact > * { animation: none; } }
 .caption { position: absolute; right: 24px; bottom: 24px; max-width: 30ch; font-size: 0.85rem; color: var(--soft); text-align: right; margin: 0; }
 
 /* Body sections */
