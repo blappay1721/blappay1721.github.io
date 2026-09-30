@@ -88,26 +88,25 @@ function countUp(el) {
 const counter = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && countUp(e.target)), { threshold: 0.6 });
 document.querySelectorAll('.result b').forEach(b => counter.observe(b));
 
-// Subtle entrance: slide up a few px and fade in, staggered by delay
-function rise(el, delay = 0) {
-    // Reduced motion: fade only, no movement
-    el.animate([{ opacity: 0, transform: `translateY(${still.matches ? 0 : 14}px)` }, {}],
+// Entrance for content the visitor just revealed (opened a project or card): fade in from dx, dy
+function rise(el, delay = 0, dx = 0, dy = 14) {
+    if (still.matches) dx = dy = 0;  // reduced motion: fade only
+    el.animate([{ opacity: 0, transform: `translate(${dx}px, ${dy}px)` }, {}],
         { duration: 500, delay, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
 }
-// Page text and buttons rise in as they scroll into view; list items one after another
-const revealer = new IntersectionObserver(es => es.forEach(e => {
-    if (!e.isIntersecting) return;
-    revealer.unobserve(e.target);
-    e.target.classList.remove('pre');
-    const sibs = e.target.parentElement.children;
-    rise(e.target, e.target.tagName === 'LI' ? [...sibs].indexOf(e.target) * 70 : 0);
-}), { threshold: 0.15 });
-document.querySelectorAll(
-    'section h2, .job, section > div > ul > li, section > div > .stack, .cats-bar, .cat, .skills > div, footer > p, footer .contact > *'
-).forEach(el => { el.classList.add('pre'); revealer.observe(el); });
-// Bullets fly in when a project opens
+// Scrolled content is never hidden. Headings draw their accent bar and bullet dots pop in
+// once they're on screen; CSS does the animating off the .seen class.
+document.documentElement.classList.add('js');
+const seer = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('seen'); seer.unobserve(e.target); }
+}), { threshold: 0.3 });
+document.querySelectorAll('h2, ul').forEach(el => {
+    [...el.children].forEach((li, k) => li.style.setProperty('--i', k));
+    seer.observe(el);
+});
+// Bullets slide in from the left when a project opens
 document.querySelectorAll('.projects details').forEach(d => d.addEventListener('toggle', () => {
-    if (d.open) d.querySelectorAll('.body li, .body .stack').forEach((el, k) => rise(el, 80 + k * 70));
+    if (d.open) d.querySelectorAll('.body li, .body .stack').forEach((el, k) => rise(el, 60 + k * 70, -16, 0));
 }));
 
 // Project category cards: each cycles through its projects' headline results and toggles its list.

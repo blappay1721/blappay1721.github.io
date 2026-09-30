@@ -42,7 +42,7 @@ h1 {
     padding: 10px 18px; border: 0; border-radius: 999px; box-shadow: inset 0 0 0 1.5px var(--ink);
     display: inline-flex; align-items: center; gap: 8px;
     background: linear-gradient(#fff, #fff) no-repeat left / 0% 100%;
-    transition: background-size .35s cubic-bezier(.2,.7,.2,1), color .25s, box-shadow .25s;
+    transition: background-size .35s cubic-bezier(.2,.7,.2,1), color .25s, box-shadow .25s, transform .15s;
 }
 .contact a:hover, .email:hover, .contact a:focus-visible, .email:focus-visible {
     background-size: 100% 100%; color: #14213d; box-shadow: inset 0 0 0 1.5px #fff;
@@ -59,8 +59,6 @@ h1 {
 .hero .contact > :nth-child(3) { animation-delay: .36s; }
 .hero .contact > :nth-child(4) { animation-delay: .42s; }
 .hero .contact { animation: none; }
-/* Hidden until scrolled into view (class set by script, so no-JS shows everything) */
-.pre { opacity: 0; }
 @keyframes fade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .hero-inner > *, .hero .contact > * { animation-name: fade; } }
 .caption { position: absolute; right: 24px; bottom: 24px; max-width: 30ch; font-size: 0.85rem; color: var(--soft); text-align: right; margin: 0; }
@@ -73,7 +71,20 @@ h3 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; margin: 0; l
 .sub { color: var(--soft); margin: 4px 0 0; }
 ul { margin: 16px 0 0; padding-left: 1.1em; max-width: 68ch; }
 li { margin-bottom: 8px; overflow-wrap: anywhere; }
-li::marker { color: var(--cobalt); }
+/* Bullets: drawn dots, so they can pop in one by one when the list scrolls into view */
+li { list-style: none; position: relative; }
+li::before {
+    content: ""; position: absolute; left: -1em; top: .68em; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--cobalt);
+    transition: transform .45s cubic-bezier(.3,1.6,.5,1) calc(var(--i, 0) * 90ms);
+}
+.js ul:not(.seen) > li::before { transform: scale(0); }
+/* Section headings: an accent bar draws in under the title */
+h2::after {
+    content: ""; display: block; width: 40px; height: 3px; margin-top: 14px; border-radius: 2px;
+    background: var(--amber); transform-origin: left; transition: transform .7s cubic-bezier(.2,.7,.2,1) .1s;
+}
+.js h2:not(.seen)::after { transform: scaleX(0); }
 
 /* Result figures: the one number each piece of work is judged by */
 .result { text-align: right; flex-shrink: 0; }
@@ -115,9 +126,13 @@ details[open]::details-content { height: auto; }
 .cat {
     font: inherit; color: inherit; text-align: left; cursor: pointer; border: 0;
     background: var(--cell-b); box-shadow: inset 0 0 0 1.5px var(--rule); border-radius: 16px;
-    padding: 20px; display: flex; flex-direction: column; transition: box-shadow .2s; position: relative;
+    padding: 20px; display: flex; flex-direction: column; transition: box-shadow .2s, transform .25s cubic-bezier(.2,.7,.2,1); position: relative;
 }
-.cat:hover { box-shadow: inset 0 0 0 1.5px var(--cobalt); }
+.cat:hover { box-shadow: inset 0 0 0 1.5px var(--cobalt); transform: translateY(-3px); }
+/* Buttons press in when clicked */
+.cat:active { transform: translateY(0) scale(.985); }
+.contact a:active, .email:active { transform: scale(.96); }
+@media (prefers-reduced-motion: reduce) { .cat:hover, .cat:active, .contact a:active, .email:active { transform: none; } }
 .cat[aria-expanded="true"] { box-shadow: inset 0 0 0 2.5px var(--cobalt); }
 .cat:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 4px; }
 .cat-name { font-weight: 700; font-size: 1.15rem; line-height: 1.2; }
