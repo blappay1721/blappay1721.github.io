@@ -135,18 +135,20 @@
                 <summary>
                     <div class="title">
                         <h3>Persona chatbot and Discord bot platform</h3>
-                        <p class="sub">Style-conditioned generation with dual-index retrieval</p>
+                        <p class="sub">A fine-tuned 1.7B model that replies in each friend's own voice</p>
                     </div>
-                    <div class="result"><b>300k+</b><small>messages analyzed</small></div>
+                    <div class="result"><b>330k</b><small>messages from 8 years of chat</small></div>
                     <span class="toggle" aria-hidden="true"></span>
                 </summary>
                 <div class="body">
                     <ul>
-                        <li>Ran stylometric analysis over 300,000+ messages to measure each author's linguistic fingerprint, then used an LLM to condense the stats and example messages into compact style descriptors.</li>
-                        <li>Dual-index RAG: separate indexes for persona style and topical facts, so style fidelity and factual accuracy don't trade off.</li>
-                        <li>Slash commands with channel-scoped responses, AI chat through Ollama, and vote-gated group commands, served by Express behind a Cloudflare tunnel.</li>
+                        <li>Built the training data from 330,000 Discord messages: scrubbed personal info (emails, phone numbers, IPs, keys), mapped alt accounts to one person, merged rapid-fire bursts into single turns, and split the history into 16,581 conversations at 45-minute gaps.</li>
+                        <li>Fine-tuned Qwen3-1.7B with QLoRA on a 12 GB RTX 3060: 64,000 reply examples across 36 personas, then a DPO pass on 21,000 preference pairs that ships only if it beats the SFT model on held-out conversations. Quantized to 4-bit GGUF and served locally with Ollama.</li>
+                        <li>Dual-index RAG: each reply gets 3 of the persona's own past lines for voice (from 156,000) and, only when confidently relevant, 2 snippets of past conversations for facts (from 39,000). A persona only "remembers" DMs they were in.</li>
+                        <li>Evaluation showed factual recall was the weak point, so a rebuild around extracted and verified facts is in progress.</li>
+                        <li>In Discord, <code>/chat</code> opens a channel where the persona posts under their own name and avatar via webhooks; public chats queue up to 5 people and answer each in turn. The bot runs over Discord's gateway, so it needs no public URL or open ports.</li>
                     </ul>
-                    <p class="stack">Node.js, discord.js, Express, Ollama, Cloudflare Tunnel · <a href="https://github.com/blappay1721/bruh" target="_blank" rel="noopener">Bot platform code</a> · Persona code private (built on friends' messages)</p>
+                    <p class="stack">Python, PyTorch, Hugging Face (TRL, PEFT), llama.cpp, Ollama, Node.js, discord.js · <a href="https://github.com/blappay1721/bruh" target="_blank" rel="noopener">Bot code</a> · Model and data pipeline private (built on friends' messages)</p>
                 </div>
             </details>
             <details>
