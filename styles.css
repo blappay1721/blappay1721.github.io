@@ -79,12 +79,13 @@ li::before {
     transition: transform .45s cubic-bezier(.3,1.6,.5,1) calc(var(--i, 0) * 90ms);
 }
 .js ul:not(.seen) > li::before { transform: scale(0); }
-/* Section headings: an accent bar draws in under the title */
-h2::after {
-    content: ""; display: block; width: 40px; height: 3px; margin-top: 14px; border-radius: 2px;
-    background: var(--amber); transform-origin: left; transition: transform .7s cubic-bezier(.2,.7,.2,1) .1s;
+/* Section headings: ink fills the title left to right as it scrolls into view (text stays readable) */
+.js h2 {
+    background: linear-gradient(90deg, var(--ink) 50%, var(--soft) 50%) 100% 0 / 200% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    transition: background-position .9s cubic-bezier(.6,0,.2,1) .1s;
 }
-.js h2:not(.seen)::after { transform: scaleX(0); }
+.js h2.seen { background-position: 0 0; }
 
 /* Result figures: the one number each piece of work is judged by */
 .result { text-align: right; flex-shrink: 0; }
@@ -102,7 +103,7 @@ summary {
     padding: 28px 0;
 }
 summary::-webkit-details-marker { display: none; }
-summary .title { flex: 1; }
+summary .title { flex: 1; min-width: 0; }
 .toggle {
     width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%;
     box-shadow: inset 0 0 0 1.5px var(--rule); position: relative; transition: transform .25s ease, background .2s;

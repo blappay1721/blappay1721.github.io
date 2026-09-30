@@ -109,6 +109,29 @@ document.querySelectorAll('.projects details').forEach(d => d.addEventListener('
     if (d.open) d.querySelectorAll('.body li, .body .stack').forEach((el, k) => rise(el, 60 + k * 70, -16, 0));
 }));
 
+// Bring a just-opened list into view, measured against the current window (no fixed sizes):
+// cards + list fit → keep both on screen, cards at the top; list fits alone → whole list, with as much
+// of the cards above it as there's room for; list taller than the window → its top. Already fully
+// visible → no scroll. Eased by hand because Chrome on Windows drops behavior:'smooth' entirely
+// when system animations are off; this is a short, user-triggered glide.
+function glideTo(head, el) {
+    const gap = 24, vh = innerHeight, top = head.getBoundingClientRect().top, r = el.getBoundingClientRect();
+    if (top >= 0 && r.bottom <= vh) return;
+    const mode = r.bottom - top + 2 * gap <= vh ? 0 : r.height + 2 * gap <= vh ? 1 : 2;
+    // Re-measured every frame: the cards' rotating text can change their height mid-glide
+    const target = () => {
+        const t = head.getBoundingClientRect().top, b = el.getBoundingClientRect();
+        return scrollY + [t - gap, b.bottom - vh + gap, b.top - gap][mode];
+    };
+    const from = scrollY, dur = Math.min(900, 300 + Math.abs(target() - from) / 3), start = performance.now();
+    const step = now => {
+        const t = Math.min((now - start) / dur, 1);
+        scrollTo({ top: from + (target() - from) * (t < .5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2), behavior: 'instant' });
+        if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+}
+
 // Project category cards: each cycles through its projects' headline results and toggles its list.
 (() => {
     const cats = [...document.querySelectorAll('.cat')];
@@ -123,7 +146,6 @@ document.querySelectorAll('.projects details').forEach(d => d.addEventListener('
     cats.forEach((btn, n) => {
         const panel = panelOf(btn), tick = btn.querySelector('.tick'), pie = btn.querySelector('.pie');
         const items = [...panel.querySelectorAll('summary')].map(s => ({
-            details: s.parentElement,
             num: s.querySelector('.result b')?.textContent ?? '',
             unit: s.querySelector('.result small')?.textContent ?? '',
             title: s.querySelector('h3').textContent
@@ -138,7 +160,22 @@ document.querySelectorAll('.projects details').forEach(d => d.addEventListener('
         };
         btn.querySelector('.cat-count').textContent = items.length + ' projects';
         panel.hidden = true;
-        show();
+        // Size the ticker for its tallest project so rotating never shifts the page below
+        let lastW = 0;
+        const fit = () => {
+            if (innerWidth === lastW) return;  // mobile toolbars fire height-only resizes
+            lastW = innerWidth;
+            const keep = i;
+            let tallest = 0;
+            tick.style.minHeight = '';
+            for (i = 0; i < items.length; i++) { show(); tallest = Math.max(tallest, tick.offsetHeight); }
+            i = keep;
+            show();
+            tick.style.minHeight = tallest + 'px';
+        };
+        fit();
+        document.fonts.ready.then(() => { lastW = 0; fit(); });
+        addEventListener('resize', fit);
         // Cards flip in order, 2s apart; hovering pauses the pie, and with it the card
         pie.style.animationDelay = -(cats.length - 1 - n) * 2 + 's';
         pie.addEventListener('animationiteration', async () => {
@@ -160,10 +197,7 @@ document.querySelectorAll('.projects details').forEach(d => d.addEventListener('
             btn.setAttribute('aria-expanded', opening);
             panel.hidden = !opening;
             if (!opening) return;
-            // Open the project the card is showing, and bring it into view
-            const d = items[i].details;
-            d.open = true;
-            d.scrollIntoView({ behavior: still.matches ? 'auto' : 'smooth', block: 'start' });
+            glideTo(cats[0].parentElement, panel);
             [...panel.children].forEach((el, k) => rise(el, k * 60));
         });
     });
