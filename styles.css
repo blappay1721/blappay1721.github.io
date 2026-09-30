@@ -61,7 +61,8 @@ h1 {
 .hero .contact { animation: none; }
 /* Hidden until scrolled into view (class set by script, so no-JS shows everything) */
 .pre { opacity: 0; }
-@media (prefers-reduced-motion: reduce) { .hero-inner > *, .hero .contact > * { animation: none; } }
+@keyframes fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .hero-inner > *, .hero .contact > * { animation-name: fade; } }
 .caption { position: absolute; right: 24px; bottom: 24px; max-width: 30ch; font-size: 0.85rem; color: var(--soft); text-align: right; margin: 0; }
 
 /* Body sections */
