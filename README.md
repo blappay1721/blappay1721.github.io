@@ -1,6 +1,6 @@
 ### Hi, I'm Bernard
 
-Computer engineering student at **UC San Diego** (B.S. expected June 2027), working across machine learning, Linux infrastructure, and digital design. Currently a technical contributor at [Silent Studios](https://silent-studio.net/) on [Mineshoku Tensei](https://mineshokutensei.com/), a live-service multiplayer game.
+Computer engineering student at **UC San Diego** (B.S. expected June 2027), working across machine learning, server infrastructure, and digital design. Currently a technical contributor at [Silent Studios](https://silent-studio.net/) on [Mineshoku Tensei](https://mineshokutensei.com/), a live-service multiplayer game.
 
 **[Portfolio](https://blappay1721.github.io/)** · **[Resume](https://blappay1721.github.io/Bernard-Lappay-Resume.pdf)** · **[LinkedIn](https://www.linkedin.com/in/blappay1721)** · blappay1721@gmail.com
 
