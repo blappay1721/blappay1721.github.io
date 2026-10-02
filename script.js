@@ -55,12 +55,14 @@
         requestAnimationFrame(tick);
     }
 
-    hero.addEventListener('pointermove', e => {
+    // On window, not the hero: the fixed nav sits over the hero and would swallow the events.
+    addEventListener('pointermove', e => {
         const r = hero.getBoundingClientRect();
-        probe = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
-        if (still.matches) draw();
+        const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        probe = x >= 0 && x <= 1 && y >= 0 && y <= 1 ? [x, y] : null;
+        if (still.matches && visible) draw();
     });
-    hero.addEventListener('pointerleave', () => { probe = null; draw(); });
+    document.documentElement.addEventListener('pointerleave', () => { probe = null; draw(); });
     new IntersectionObserver(([e]) => visible = e.isIntersecting).observe(hero);
     dark.addEventListener('change', () => { readColors(); draw(); });
     addEventListener('resize', resize);
