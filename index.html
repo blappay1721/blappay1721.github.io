@@ -192,22 +192,22 @@
             <details>
                 <summary>
                     <div class="title">
-                        <h3>Self-hosted game server infrastructure</h3>
-                        <p class="sub">Multi-server network on a headless Ubuntu homelab</p>
+                        <h3>Self-hosted game server platform</h3>
+                        <p class="sub">Containerized Minecraft network on a 16 GB mini PC</p>
                     </div>
                     <div class="result"><b>30+</b><small>unique users</small></div>
                     <span class="toggle" aria-hidden="true"></span>
                 </summary>
                 <div class="body">
                     <ul>
-                        <li>Several Paper backends behind a Velocity proxy, managed with tmux.</li>
-                        <li>Firewall and intrusion prevention with ufw and fail2ban: rate-limited SSH, an admin-only panel port, and a custom jail whose filter I rewrote to catch slow read-timeout bot scanners. Checked reachability end to end with ss, tcpdump and external probes.</li>
-                        <li>Traced recurring NVMe timeouts, controller resets and a watchdog crash to a firmware power-state (APST) bug and fixed it with a kernel boot parameter.</li>
-                        <li>Traced mass player disconnects to Wi-Fi power management and mesh roaming, and made the fix persistent in NetworkManager.</li>
-                        <li>Moved large data sets to secondary storage with copy, checksum dry-run, delete, then symlink, on UUID-based mounts.</li>
-                        <li>Set up Pi-hole for network-level ad-block for over a dozen devices on my home network.</li>
+                        <li>Moved a Velocity proxy, three Paper servers and a limbo fallback from hand-run tmux sessions to Docker containers managed by Pelican, one server at a time from a written runbook, with no data lost. A cutover script checks preconditions, takes a fresh backup, copies the data, repoints the proxy and keeps the old copy until I confirm, so every move can be rolled back.</li>
+                        <li>The two large worlds start on demand: a player who asks for one waits on the hub with a countdown, about 1 min 50 s from a cold start, and each world stops about 11 minutes after its last player leaves. That frees about 7.5 GB of the 16 GB while nobody is playing, on a box that also runs my Discord bot's LLM.</li>
+                        <li>Hourly restic snapshots go to a local repository and to an append-only one on another machine over Tailscale. The job pauses world saves through the panel's API with a service account that can only send console commands, copies live SQLite databases with <code>VACUUM INTO</code>, and has passed a restore test.</li>
+                        <li>No admin ports open to the internet: the panel goes through a Cloudflare Tunnel, SFTP and dashboards are reachable only over Tailscale, and backends listen only on the Docker bridge. Moved fail2ban's bans into Docker's <code>DOCKER-USER</code> chain after finding that ufw rules never reach container ports, and rewrote a jail filter to catch slow read-timeout bot scanners.</li>
+                        <li>Split the 1 TB NVMe into LVM volumes for game data, backups, metrics and databases, and cleared 32 GB of redundant plugin archives. Per-container memory and CPU limits, zram swap, and JVM flags that return idle heap to the OS keep the network and the LLM within 16 GB, watched in Grafana.</li>
+                        <li>Traced NVMe controller resets and a watchdog crash to a firmware power-state (APST) bug, fixed with a kernel boot parameter, and mass player disconnects to Wi-Fi power management and mesh roaming, fixed persistently in NetworkManager.</li>
                     </ul>
-                    <p class="stack">Ubuntu Server, ufw, fail2ban, iptables, tmux, PM2</p>
+                    <p class="stack">Ubuntu Server, Docker, Pelican/Wings, restic, Tailscale, Cloudflare Tunnel, ufw, iptables, fail2ban, LVM, VictoriaMetrics, Grafana, Bash</p>
                 </div>
             </details>
             <details>
