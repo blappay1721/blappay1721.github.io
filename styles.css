@@ -76,6 +76,14 @@ section:focus, footer:focus { outline: none; }
 #field-print { display: none; }  /* the printout's outline-only field, drawn by script.js */
 .hero-inner { position: relative; width: min(1120px, 100%); margin: 0 auto; padding: 0 24px 9vh; pointer-events: none; }
 .hero-inner a, .hero-inner button { pointer-events: auto; }
+/* Portrait: a circle above the name, as wide as "Bernard". The block shrinks to the h1's
+   min-content (its longest word); a %-width image adds nothing to that, so it just fills it. */
+.name-block { width: min-content; }
+.hero-inner { padding-top: clamp(72px, 12vh, 120px); }  /* clears the nav when the portrait makes the hero taller than the screen */
+.portrait {
+    display: block; width: 100%; height: auto; border-radius: 50%; margin: 0 0 clamp(20px, 3vw, 36px);
+    box-shadow: 0 24px 60px -24px rgb(20 33 61 / .55);
+}
 h1 {
     font-weight: 900; font-size: clamp(3.2rem, 11vw, 9rem); line-height: 0.88;
     letter-spacing: -0.045em; margin: 0 0 28px;
@@ -276,6 +284,8 @@ footer p { font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 700; letter-spaci
     /* Header: the Voronoi field as a rounded panel (cropped to fit, not squashed) */
     .hero { min-height: 0; display: block; border-radius: 10pt; padding: 22pt 18pt 16pt; border: 1px solid var(--rule); }
     #field { display: none; }
+    .name-block { width: auto; }  /* the name prints on one line here */
+    .portrait { width: 64pt; margin-bottom: 8pt; box-shadow: none; }
     #field-print { display: block; object-fit: cover; }
     h1 { font-size: 30pt; margin: 0 0 4pt; }
     h1 br { display: none; }  /* the space after the <br> in the HTML keeps "Bernard Lappay" apart */
