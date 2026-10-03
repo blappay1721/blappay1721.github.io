@@ -106,10 +106,23 @@ document.querySelectorAll('h2, ul').forEach(el => {
     [...el.children].forEach((li, k) => li.style.setProperty('--i', k));
     seer.observe(el);
 });
-// Bullets slide in from the left when a project opens
+// Bullets slide in from the left when a project opens (not when printing opens them all)
+let printing = [];
 document.querySelectorAll('.projects details').forEach(d => d.addEventListener('toggle', () => {
-    if (d.open) d.querySelectorAll('.body li, .body .stack').forEach((el, k) => rise(el, 60 + k * 70, -16, 0));
+    if (d.open && !printing.includes(d)) d.querySelectorAll('.body li, .body .stack').forEach((el, k) => rise(el, 60 + k * 70, -16, 0));
 }));
+// Browsers fold a heading inside <summary> into the row's button, so screen readers can't jump to
+// project titles. Give each project a real (visually hidden) heading just before its row instead.
+document.querySelectorAll('.projects summary h3').forEach(h => {
+    h.setAttribute('role', 'none');
+    h.closest('details').before(Object.assign(document.createElement('h3'), { className: 'sr-only', textContent: h.textContent }));
+});
+// Printing shows every project expanded, then puts things back
+addEventListener('beforeprint', () => {
+    printing = [...document.querySelectorAll('.projects details:not([open])')];
+    printing.forEach(d => d.open = true);
+});
+addEventListener('afterprint', () => { printing.forEach(d => d.open = false); printing = []; });
 
 // Gentle eased scroll to wherever target() says, re-measured every frame so layout shifts mid-glide
 // (the cards' rotating text, fonts landing) don't make it miss. Hand-rolled because Chrome on
@@ -119,6 +132,7 @@ function glide(target) {
     const to = () => Math.max(0, Math.min(target(), max()));
     const dist = Math.abs(to() - from);
     if (dist < 8) return;  // already there; don't fidget
+    if (still.matches) return scrollTo({ top: to(), behavior: 'instant' });  // reduced motion: jump
     const dur = Math.min(1000, 350 + dist / 3), start = performance.now();
     const step = now => {
         const t = Math.min((now - start) / dur, 1);
@@ -170,6 +184,16 @@ links.forEach(a => a.addEventListener('click', e => {
     el.setAttribute('tabindex', '-1');
     el.focus({ preventScroll: true });  // keyboard and screen readers continue from the section
 }));
+// ← → step through the nav links (wrapping), Home/End jump to the ends; Tab still visits each one.
+// Only links on screen count: the name link is hidden at the top of the page and on phones.
+nav.addEventListener('keydown', e => {
+    const shown = links.filter(a => a.checkVisibility({ visibilityProperty: true, checkVisibilityCSS: true }));
+    const k = shown.indexOf(e.target);
+    const to = { ArrowRight: k + 1, ArrowLeft: k - 1, Home: 0, End: shown.length - 1 }[e.key];
+    if (k < 0 || to === undefined || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    e.preventDefault();
+    shown[(to + shown.length) % shown.length].focus();
+});
 const solid = () => nav.classList.toggle('solid', scrollY > 8);
 addEventListener('scroll', solid, { passive: true });
 solid();
@@ -208,6 +232,28 @@ markCurrent();
         pause.textContent = on ? 'Resume rotation' : 'Pause rotation';
         cats[0].parentElement.classList.toggle('paused', on);
     });
+    // Keyboard, like a tab list: the cards are one Tab stop (so Tab from a card reaches its open list
+    // next); ← → move between cards, Home/End jump to the ends. ↑ ↓ are left to scroll the page.
+    // Esc closes the open list and returns to its card. Leaving the cards resets the stop to the
+    // open card, so Shift+Tab out of a list lands back on the card that opened it.
+    const group = cats[0].parentElement;
+    const openCat = () => cats.find(b => b.getAttribute('aria-expanded') === 'true');
+    const rove = btn => cats.forEach(b => b.tabIndex = b === btn ? 0 : -1);
+    rove(cats[0]);
+    group.addEventListener('keydown', e => {
+        const k = cats.indexOf(e.target);
+        const to = { ArrowRight: k + 1, ArrowLeft: k - 1, Home: 0, End: cats.length - 1 }[e.key];
+        if (k < 0 || to === undefined || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+        e.preventDefault();
+        const next = cats[(to + cats.length) % cats.length];
+        rove(next); next.focus();
+    });
+    group.addEventListener('focusout', e => { if (!group.contains(e.relatedTarget) && openCat()) rove(openCat()); });
+    addEventListener('keydown', e => {
+        const open = openCat();
+        if (e.key !== 'Escape' || !open || !(open === e.target || panelOf(open).contains(e.target))) return;
+        open.click(); rove(open); open.focus();
+    });
     cats.forEach((btn, n) => {
         const panel = panelOf(btn), tick = btn.querySelector('.tick'), pie = btn.querySelector('.pie');
         const items = [...panel.querySelectorAll('summary')].map(s => ({
@@ -224,7 +270,9 @@ markCurrent();
             if (num) countUp(num);
         };
         btn.querySelector('.cat-count').textContent = items.length + ' projects';
-        panel.hidden = true;
+        // Closed lists stay searchable: Ctrl+F finds text in them (where supported) and opens the category
+        panel.hidden = 'until-found';
+        panel.addEventListener('beforematch', () => { rove(btn); toggle(true); });
         // Size the ticker for its tallest project so rotating never shifts the page below
         let lastW = 0;
         const fit = () => {
@@ -256,21 +304,25 @@ markCurrent();
                 [{ opacity: 0, transform: `translateY(${move}px)` }, {}],
                 { duration: 420, delay: k * 70, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' }));
         });
-        btn.addEventListener('click', () => {
-            const opening = btn.getAttribute('aria-expanded') !== 'true';
-            cats.forEach(b => { b.setAttribute('aria-expanded', 'false'); panelOf(b).hidden = true; });
+        // Open this card's list (closing the others), or close it; only a click scrolls and animates,
+        // since find-in-page does its own scrolling
+        function toggle(opening, click) {
+            cats.forEach(b => { b.setAttribute('aria-expanded', 'false'); panelOf(b).hidden = 'until-found'; });
             btn.setAttribute('aria-expanded', opening);
-            panel.hidden = !opening;
-            if (!opening) return;
+            if (opening) panel.hidden = false;
+            if (!opening || !click) return;
             reveal(cats[0].parentElement, panel);
             [...panel.children].forEach((el, k) => rise(el, k * 60));
-        });
+        }
+        btn.addEventListener('click', () => { rove(btn); toggle(btn.getAttribute('aria-expanded') !== 'true', true); });
     });
 })();
 
-// Email: clicking copies the address; the label briefly reads "Copied ✓"
+// Email: assembled here so the address never appears whole in the HTML for scrapers to harvest.
+// Clicking copies it; the label briefly reads "Copied ✓"
 document.querySelectorAll('.email').forEach(btn => {
-    const label = btn.querySelector('span'), email = btn.dataset.email;
+    const label = btn.querySelector('span'), email = btn.dataset.user + '@' + btn.dataset.host;
+    label.textContent = email;
     btn.addEventListener('click', async () => {
         btn.style.minWidth = btn.offsetWidth + 'px';  // keep the pill from shrinking
         try {

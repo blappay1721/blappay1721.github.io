@@ -23,6 +23,8 @@ body {
     font: 400 17px/1.6 "Schibsted Grotesk", system-ui, sans-serif;
 }
 a { color: var(--cobalt); text-underline-offset: 3px; }
+/* Links that open a new tab say so: a small arrow, announced as "opens in new tab" where supported */
+a[target="_blank"]::after { content: "↗"; content: "↗" / "(opens in new tab)"; font-size: .8em; margin-left: .15em; }
 a:focus-visible, summary:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 4px; border-radius: 2px; }
 
 /* Nav: fixed bar, see-through over the hero, solid once scrolled */
@@ -53,6 +55,7 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--cobalt); outli
 .nav ul a[aria-current]::after { transform: none; }
 .nav a:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 4px; border-radius: 2px; }
 section:focus, footer:focus { outline: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 640px) {
     .nav .nav-name { display: none; }
     .nav-inner { padding: 0; height: 48px; }
@@ -89,6 +92,8 @@ h1 {
 .contact a:hover, .email:hover, .contact a:focus-visible, .email:focus-visible {
     background-size: 100% 100%; color: #14213d; box-shadow: inset 0 0 0 1.5px #fff;
 }
+/* The white fill alone is faint on the light background, so keyboard focus also gets the ring */
+.contact a:focus-visible, .email:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 3px; }
 .ico { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
 .email span { min-width: 0; overflow-wrap: anywhere; text-align: left; }
 @media (prefers-reduced-motion: reduce) { .contact a, .email { transition: color .25s, box-shadow .25s; } }
@@ -202,6 +207,9 @@ details[open]::details-content { height: auto; }
     .hint::after { content: "Tap to show projects ↓"; }
     .cat[aria-expanded="true"] .hint::after { content: "Tap to hide ↑"; }
 }
+/* Keyboard focus: name the keys instead */
+.cat:focus-visible .hint::after { content: "Enter to show projects · ← → to switch"; }
+.cat[aria-expanded="true"]:focus-visible .hint::after { content: "Enter or Esc to hide · ← → to switch"; }
 .cats-bar { display: flex; justify-content: flex-end; margin: -8px 0 8px; }
 .pause {
     font: inherit; font-size: 0.85rem; color: var(--soft); background: none; border: 0; padding: 4px 0;
@@ -211,6 +219,10 @@ details[open]::details-content { height: auto; }
 .pause:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 4px; border-radius: 2px; }
 .cat-name { padding-right: 24px; }
 .cats + .projects, .projects + .projects { margin-top: 32px; }
+/* A closed list kept searchable by find-in-page still has a box; don't let it draw a rule or take space */
+.projects[hidden="until-found"] { border: 0; margin: 0; }
+/* Without JavaScript the cards and email button can't work; every project list is shown instead */
+html:not(.js) .cats, html:not(.js) .cats-bar, html:not(.js) .email { display: none; }
 
 .skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
 .skills h3 { font-size: 1rem; margin-bottom: 6px; }
@@ -233,4 +245,41 @@ footer p { font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 700; letter-spaci
     summary { flex-wrap: wrap; gap: 12px 16px; }
     summary .result { order: 3; width: 100%; }
     .caption { display: none; }
+}
+
+/* 404 page */
+.notfound { min-height: 100svh; display: grid; align-content: center; }
+
+/* Windows High Contrast and other forced-color modes drop box-shadows and backgrounds,
+   which draw these borders and the +/− marks; give them real borders and system colors */
+@media (forced-colors: active) {
+    .cat, .contact a, .email, .toggle { border: 1px solid CanvasText; }
+    .toggle::before, .toggle::after, .nav ul a::after { forced-color-adjust: none; background: CanvasText; }
+}
+
+/* Print / save as PDF: plain black on white, every project expanded, link targets spelled out */
+@media print {
+    :root { --paper: #fff; --ink: #000; --soft: #333; --rule: #999; --cobalt: #000; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .nav, .skip, #field, .cats, .cats-bar, .toggle { display: none !important; }
+    body { font-size: 10.5pt; }
+    .hero { min-height: 0; display: block; }
+    .hero-inner { padding: 0 0 12pt; }
+    h1 { font-size: 30pt; margin-bottom: 8pt; }
+    .lede { margin-bottom: 8pt; }
+    .contact a, .email { box-shadow: none; padding: 0; background: none; }
+    .ico { display: none; }
+    .contact a::after { content: " · " attr(href); font-size: .85em; }
+    section { padding-top: 18pt; }
+    .js h2 { background: none; color: var(--ink); }
+    li::before { transform: none !important; }
+    .projects[hidden] { display: block !important; content-visibility: visible !important; border-top: 2px solid var(--ink); margin-top: 12pt; }
+    summary { padding: 10pt 0; }
+    .body { padding-bottom: 10pt; }
+    details, .job, .skills > div { break-inside: avoid; }
+    h2, h3 { break-after: avoid; }
+    .stack a::after, .sub a::after, h3 a::after { content: " (" attr(href) ")"; font-size: .85em; }
+    footer { padding: 24pt 0 0; }
+    footer p { font-size: 16pt; }
+    .fine { margin-top: 16pt; }
 }

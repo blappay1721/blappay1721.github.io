@@ -22,3 +22,11 @@ Computer engineering student at **UC San Diego** (B.S. expected June 2027), work
 - **Languages:** Python · Java · C · JavaScript · SystemVerilog · MIPS assembly · Bash
 - **ML:** vLLM · Hugging Face · LoRA (SFT, DPO) · RAG · Ollama · NumPy
 - **Systems:** Ubuntu Server · systemd · ufw/fail2ban · Maven · Git · ModelSim
+
+#### Credits
+
+The portfolio site is set in [Schibsted Grotesk](https://github.com/schibsted/schibsted-grotesk), © 2023 The Schibsted-Grotesk Project Authors, used under the [SIL Open Font License 1.1](fonts/OFL.txt). GitHub, LinkedIn and Gmail icons are from [Simple Icons](https://simpleicons.org/) (CC0 1.0); the logos are trademarks of their respective owners.
+
+#### License
+
+The site's code is [MIT](LICENSE); its written content, resume and images are all rights reserved. See [LICENSE](LICENSE) for details.
