@@ -72,7 +72,8 @@ section:focus, footer:focus { outline: none; }
 
 /* Hero: live nearest-neighbor field */
 .hero { position: relative; min-height: 100svh; display: grid; align-items: end; overflow: hidden; }
-#field { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+#field, #field-print { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+#field-print { display: none; }  /* the printout's outline-only field, drawn by script.js */
 .hero-inner { position: relative; width: min(1120px, 100%); margin: 0 auto; padding: 0 24px 9vh; pointer-events: none; }
 .hero-inner a, .hero-inner button { pointer-events: auto; }
 h1 {
@@ -257,29 +258,66 @@ footer p { font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 700; letter-spaci
     .toggle::before, .toggle::after, .nav ul a::after { forced-color-adjust: none; background: CanvasText; }
 }
 
-/* Print / save as PDF: plain black on white, every project expanded, link targets spelled out */
+/* Print / save as PDF: white paper with the light theme's accent colors (even when the screen is
+   dark), the Voronoi header as cell outlines, every project expanded, link targets spelled out.
+   No backgrounds or box-shadows are relied on, since printing drops them by default; outlines are
+   real borders. A printed page is narrower than the phone breakpoint, so this undoes those overrides. */
+@page { margin: 14mm 16mm; }
 @media print {
-    :root { --paper: #fff; --ink: #000; --soft: #333; --rule: #999; --cobalt: #000; }
+    :root {
+        --paper: #fff; --ink: #14213d; --soft: #52607a; --rule: #c9d1de;
+        --cobalt: #2446d8; --amber: #d98a1c; --cell-b: #ffffff;  /* six digits: script.js reads it */
+    }
     *, *::before, *::after { animation: none !important; transition: none !important; }
-    .nav, .skip, #field, .cats, .cats-bar, .toggle { display: none !important; }
-    body { font-size: 10.5pt; }
-    .hero { min-height: 0; display: block; }
-    .hero-inner { padding: 0 0 12pt; }
-    h1 { font-size: 30pt; margin-bottom: 8pt; }
-    .lede { margin-bottom: 8pt; }
-    .contact a, .email { box-shadow: none; padding: 0; background: none; }
-    .ico { display: none; }
-    .contact a::after { content: " · " attr(href); font-size: .85em; }
-    section { padding-top: 18pt; }
-    .js h2 { background: none; color: var(--ink); }
-    li::before { transform: none !important; }
-    .projects[hidden] { display: block !important; content-visibility: visible !important; border-top: 2px solid var(--ink); margin-top: 12pt; }
-    summary { padding: 10pt 0; }
-    .body { padding-bottom: 10pt; }
-    details, .job, .skills > div { break-inside: avoid; }
-    h2, h3 { break-after: avoid; }
-    .stack a::after, .sub a::after, h3 a::after { content: " (" attr(href) ")"; font-size: .85em; }
-    footer { padding: 24pt 0 0; }
-    footer p { font-size: 16pt; }
-    .fine { margin-top: 16pt; }
+    .nav, .skip, .cats, .cats-bar, .toggle, .contact a[href$=".pdf"] { display: none !important; }
+    body { font-size: 10pt; line-height: 1.45; }
+    .wrap, .hero-inner { width: auto; padding: 0; }
+
+    /* Header: the Voronoi field as a rounded panel (cropped to fit, not squashed) */
+    .hero { min-height: 0; display: block; border-radius: 10pt; padding: 22pt 18pt 16pt; border: 1px solid var(--rule); }
+    #field { display: none; }
+    #field-print { display: block; object-fit: cover; }
+    h1 { font-size: 30pt; margin: 0 0 4pt; }
+    h1 br { display: none; }  /* the space after the <br> in the HTML keeps "Bernard Lappay" apart */
+    .lede { font-size: 12pt; max-width: none; margin: 0 0 6pt; }
+    /* Contact pills keep their look, with the address written in */
+    .contact { gap: 6pt; }
+    .contact a, .email { padding: 4pt 10pt; gap: 5pt; font-size: 9pt; background: #fff; box-shadow: none; border: 1px solid var(--ink); }
+    .ico { width: 11pt; height: 11pt; }
+    .contact a[href^="http"]::after { content: attr(href); color: var(--soft); margin-left: 2pt; }
+
+    section { display: block; padding-top: 16pt; }
+    .js h2 { background: none; color: var(--cobalt); }
+    h2 { font-size: 16pt; margin-bottom: 6pt; }
+    h3 { font-size: 12pt; }
+    .skills h3 { font-size: 10pt; }
+    ul { max-width: none; margin-top: 6pt; }
+    li { margin-bottom: 3pt; }
+    li::before { transform: none !important; top: .6em; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .stack { margin-top: 6pt; font-size: 9pt; }
+
+    /* Result figures stay beside their titles, sized for paper */
+    .job { flex-direction: row; align-items: flex-start; }
+    .result { text-align: right; }
+    .result b { font-size: 16pt; letter-spacing: -0.02em; padding-right: 2pt; }  /* room for the last glyph's overhang */
+    .result small { font-size: 7.5pt; line-height: 1.25; display: block; }
+    summary { flex-wrap: nowrap; align-items: flex-start; gap: 16pt; padding: 8pt 0 4pt; }
+    summary .result { order: 0; width: auto; max-width: 30%; }
+
+    .projects[hidden] { display: block !important; content-visibility: visible !important; }
+    .projects { border-top-width: 1.5px; margin-top: 10pt !important; }
+    .body { padding-bottom: 8pt; }
+    .skills { grid-template-columns: repeat(3, 1fr); gap: 8pt 16pt; }
+
+    /* Keep each project, job and skill group whole, and headings with what follows */
+    details, .job, #skills { break-inside: avoid; }
+    h2, h3, summary { break-after: avoid; }
+    li, p { orphans: 2; widows: 2; }
+    a[target="_blank"]::after { content: none; }  /* the new-tab arrow means nothing on paper */
+    .stack a[href]::after, .sub a[href]::after, h3 a[href]::after { content: " (" attr(href) ")"; font-size: .85em; color: var(--soft); }
+
+    footer { padding: 18pt 0 0; break-inside: avoid; }
+    footer > p { font-size: 13pt; max-width: none; margin-bottom: 6pt; }
+    footer .contact { display: none; }
+    .fine { margin-top: 8pt; padding-top: 8pt; }
 }

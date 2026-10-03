@@ -3,7 +3,7 @@
     const canvas = document.getElementById('field');
     const ctx = canvas.getContext('2d');
     const hero = canvas.parentElement;
-    const CELL = 8;
+    let CELL = 8;
     const still = matchMedia('(prefers-reduced-motion: reduce)');
     const dark = matchMedia('(prefers-color-scheme: dark)');
     let w, h, img, colors, probe = null, visible = true;
@@ -30,13 +30,16 @@
         if (probe) pts.push([probe[0] * w, probe[1] * h, -1]);
         // ponytail: brute-force nearest seed per cell, O(cells × seeds); fine at 8px cells and 17 seeds
         for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i += 4) {
-            let d1 = Infinity, d2 = Infinity, k = 0;
+            let d1 = Infinity, d2 = Infinity, k = 0, k2 = 0;
             for (let j = 0; j < pts.length; j++) {
                 const dx = pts[j][0] - x, dy = pts[j][1] - y, dd = dx * dx + dy * dy;
-                if (dd < d1) { d2 = d1; d1 = dd; k = j; } else if (dd < d2) d2 = dd;
+                if (dd < d1) { d2 = d1; k2 = k; d1 = dd; k = j; } else if (dd < d2) { d2 = dd; k2 = j; }
             }
-            const t = pts[k][2];
-            const c = Math.sqrt(d2) - Math.sqrt(d1) < 1 ? edge
+            // Edge = within half a cell of the boundary between the two nearest seeds. That boundary's
+            // distance is (d2 - d1) / (2 × seed gap), which keeps lines one cell wide even where two
+            // seeds sit close together (a plain distance difference smears into a wedge there).
+            const t = pts[k][2], gap = Math.hypot(pts[k][0] - pts[k2][0], pts[k][1] - pts[k2][1]);
+            const c = (d2 - d1) / (2 * gap) < .5 ? edge
                 : t < 0 ? pc
                 : [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
             d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = 255;
@@ -66,6 +69,19 @@
     new IntersectionObserver(([e]) => visible = e.isIntersecting).observe(hero);
     dark.addEventListener('change', () => { readColors(); draw(); });
     addEventListener('resize', resize);
+    // Printouts are white paper: just the cell outlines, in a light tint of the theme's cobalt, on a
+    // finer grid so the lines come out thin. Drawn once into a print-only canvas, because browsers
+    // can fire afterprint (and redraw the screen field) before they capture the page.
+    const paper = Object.assign(document.createElement('canvas'), { id: 'field-print' });
+    paper.setAttribute('aria-hidden', 'true');
+    canvas.after(paper);
+    addEventListener('beforeprint', () => {
+        const keep = colors;
+        CELL = 3; colors = ['#ffffff', '#ffffff', '#b9c5f2', '#ffffff'].map(hex); probe = null; resize();
+        paper.width = w; paper.height = h;
+        paper.getContext('2d').drawImage(canvas, 0, 0);
+        CELL = 8; colors = keep; resize();
+    });
 
     readColors(); resize(); tick();
 })();

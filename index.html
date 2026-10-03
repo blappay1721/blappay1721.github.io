@@ -31,7 +31,7 @@
     </script>
     <link rel="canonical" href="https://blappay1721.github.io/">
     <link rel="preload" href="fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="styles.css?v=15">
+    <link rel="stylesheet" href="styles.css?v=20">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -50,7 +50,7 @@
 <header class="hero" id="top">
     <canvas id="field" aria-hidden="true"></canvas>
     <div class="hero-inner">
-        <h1>Bernard<br>Lappay</h1>
+        <h1>Bernard<br> Lappay</h1>
         <p class="lede">Computer engineering student at UC San Diego.</p>
         <div class="contact">
             <a href="Bernard-Lappay-Resume.pdf" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm-1 1.8L18.2 9H13zM8 12.5h8V14H8zm0 3.5h8v1.5H8z"/></svg>Resume</a>
@@ -127,10 +127,10 @@
                 </summary>
                 <div class="body">
                     <ul>
-                        <li>Made a fixed 4B model (Qwen3-4B-Thinking-2507) more reliable at math through inference-time design rather than retraining.</li>
-                        <li>Verifier-guided majority vote: three candidates per problem, two must agree, with answers normalized across multiple-choice and free-response formats. Failures retry with a larger token budget, re-prompted with prior attempts, vote history and verifier feedback.</li>
-                        <li>Audited and repaired 7,500 distilled examples and trained LoRA SFT and DPO adapters. Noisy data first cut accuracy (61 to 58); the cleaned adapter still didn't beat the base model overall, so it runs only as a fallback on unresolved multiple-choice questions, where it helps.</li>
-                        <li>Checkpointed, resumable batch inference with vLLM on rented H100s. In an early milestone run, voting and retries lifted multiple-choice accuracy from 73.6% to 81.6%.</li>
+                        <li>Made a fixed 4B model (Qwen3-4B-Thinking) more reliable at math mainly through inference-time design, not retraining.</li>
+                        <li>Verifier-guided majority vote: three candidates per problem and two must agree. Failed problems retry with a bigger token budget and feedback from earlier attempts.</li>
+                        <li>Cleaned 7,500 distilled examples and trained LoRA adapters (SFT and DPO). They didn't beat the base model overall, so they run only as a fallback on the multiple-choice questions where they help.</li>
+                        <li>Resumable batch inference with vLLM on rented H100s. In an early run, voting and retries alone lifted multiple-choice accuracy from 73.6% to 81.6%.</li>
                     </ul>
                     <p class="stack">Python, vLLM, Hugging Face, LoRA, DPO, RunPod · <a href="https://github.com/blappay1721/151B_SP26_Competition" target="_blank" rel="noopener">Code</a></p>
                 </div>
@@ -146,11 +146,11 @@
                 </summary>
                 <div class="body">
                     <ul>
-                        <li>Built the training data from 330,000 Discord messages: scrubbed personal info (emails, phone numbers, IPs, keys), mapped alt accounts to one person, merged rapid-fire bursts into single turns, and split the history into 16,581 conversations at 45-minute gaps.</li>
-                        <li>Fine-tuned Qwen3-1.7B with QLoRA on a 12 GB RTX 3060: 64,000 reply examples across 36 personas, then a DPO pass on 21,000 preference pairs that ships only if it beats the SFT model on held-out conversations. Quantized to 4-bit GGUF and served locally with Ollama.</li>
-                        <li>Dual-index RAG: each reply gets 3 of the persona's own past lines for voice (from 156,000) and, only when confidently relevant, 2 snippets of past conversations for facts (from 39,000). A persona only "remembers" DMs they were in.</li>
-                        <li>Evaluation showed factual recall was the weak point, so a rebuild around extracted and verified facts is in progress.</li>
-                        <li>In Discord, <code>/chat</code> opens a channel where the persona posts under their own name and avatar via webhooks; public chats queue up to 5 people and answer each in turn. The bot runs over Discord's gateway, so it needs no public URL or open ports.</li>
+                        <li>Built the training set from 330,000 Discord messages: scrubbed personal info, merged alt accounts and split 8 years of history into 16,581 conversations.</li>
+                        <li>Fine-tuned Qwen3-1.7B with QLoRA on a single 12 GB GPU (64,000 examples, 36 personas), then a DPO pass that ships only if it beats the SFT model on held-out chats. Runs locally, quantized to 4-bit.</li>
+                        <li>Retrieval from two indexes: the persona's own past lines for their voice, and past conversations for facts when relevant. A persona only “remembers” DMs they were in.</li>
+                        <li>Evaluation showed factual recall was the weak point, so a rebuild around verified facts is in progress.</li>
+                        <li>In Discord, <code>/chat</code> opens a channel where the persona posts under their own name and avatar, taking turns with up to 5 people. Needs no public URL or open ports.</li>
                     </ul>
                     <p class="stack">Python, PyTorch, Hugging Face (TRL, PEFT), llama.cpp, Ollama, Node.js, discord.js · <a href="https://github.com/blappay1721/bruh" target="_blank" rel="noopener">Bot code</a> · Model and data pipeline private (built on friends' messages)</p>
                 </div>
@@ -167,7 +167,7 @@
                 <div class="body">
                     <ul>
                         <li>Naive Bayes model with four hidden movie-goer types, trained from scratch with Expectation–Maximization on a 288 × 60 survey.</li>
-                        <li>Vectorized EM in log space with log-sum-exp for stability. Log-likelihood never decreases and converges to the course reference value to four decimal places.</li>
+                        <li>Vectorized in log space (log-sum-exp) for numerical stability; matches the course's reference result to four decimal places.</li>
                         <li>Interactive survey: rate the movies you've seen and it infers your type mix and ranks the ones you haven't.</li>
                     </ul>
                     <p class="stack">Python, NumPy, ipywidgets · <a href="https://github.com/blappay1721/EM-Movie-Recommender" target="_blank" rel="noopener">Code</a></p>
@@ -184,7 +184,7 @@
                 </summary>
                 <div class="body">
                     <ul>
-                        <li>1-NN over 7,500 training images in NumPy. One vectorized distance computation classifies the whole test set in about 0.25 s, benchmarked against scikit-learn's KDTree and BallTree.</li>
+                        <li>1-NN in NumPy over 7,500 training images: one vectorized computation classifies the whole test set in about 0.25 s, benchmarked against scikit-learn's tree-based search.</li>
                         <li>Confusion matrix and misclassified examples shown next to the training images they matched.</li>
                         <li>Browser demo runs the same search in JavaScript: draw a digit and see its five nearest training images.</li>
                     </ul>
@@ -204,14 +204,13 @@
                 </summary>
                 <div class="body">
                     <ul>
-                        <li>In one day, moved a Velocity proxy and three Paper servers from hand-run tmux sessions to Docker containers managed by Pelican, one server at a time from a written runbook, with no data lost, and added a limbo fallback that holds players while the hub restarts. A cutover script checks preconditions, takes a fresh backup, copies the data, repoints the proxy and keeps the old copy until I confirm, so every move can be rolled back.</li>
-                        <li>The two large worlds start on demand: a player who asks for one waits on the hub with a countdown, about 1 min 50 s from a cold start with 57 plugins, and each world stops about 11 minutes after its last player leaves. The proxy plugin that does this uses a service account that can only start and stop those two servers. That frees about 7.5 GB of the 16 GB while nobody is playing, on a box that also runs my Discord bot's LLM.</li>
-                        <li>Hourly encrypted restic snapshots, 30–110 MB of new data each, go to a local repository and queue to an append-only one on another machine over Tailscale, so a compromised server can add snapshots there but not delete them. The job pauses world saves through the panel's API with a service account that can only send console commands, copies live SQLite databases with <code>VACUUM INTO</code>, and has passed a restore test.</li>
-                        <li>No admin ports open to the internet: collaborators use the web panel through a Cloudflare Tunnel, with 2FA and per-server permissions instead of SSH, SFTP and dashboards are reachable only over Tailscale, and backends listen only on the Docker bridge. Players join by domain through an SRV record. Moved fail2ban's bans into Docker's <code>DOCKER-USER</code> chain after finding that ufw rules never reach container ports, and rewrote a jail filter to catch slow read-timeout bot scanners.</li>
-                        <li>Split the 1 TB NVMe into LVM volumes for game data, backups, metrics and databases, and cleared 32 GB of redundant plugin archives. Per-container memory and CPU limits, zram swap, and JVM flags that return idle heap to the OS keep the network and the LLM within 16 GB, watched in Grafana.</li>
-                        <li>Traced NVMe controller resets and a watchdog crash to a firmware power-state (APST) bug, fixed with a kernel boot parameter, and mass player disconnects to Wi-Fi power management and mesh roaming, fixed persistently in NetworkManager.</li>
+                        <li>Migrated a live network (a proxy and three game servers) into Docker containers in one day with no data lost, using a runbook and a cutover script that backs up first and can roll back.</li>
+                        <li>The two largest worlds start when a player asks and shut down when empty, freeing about 7.5 of the machine's 16 GB while nobody is playing, for the LLM that shares it.</li>
+                        <li>Hourly encrypted backups to an append-only copy on a second machine, so even a compromised server can't delete them. Restore-tested.</li>
+                        <li>No admin ports open to the internet: the web panel sits behind Cloudflare Tunnel with 2FA, and SSH and dashboards are Tailscale-only. Also caught that the firewall wasn't covering Docker's ports, and fixed it.</li>
+                        <li>Traced storage resets and a crash to an SSD firmware power-saving bug (fixed with a kernel parameter) and mass disconnects to Wi-Fi power management.</li>
                     </ul>
-                    <p class="stack">Ubuntu Server, Docker, Pelican/Wings, Paper, Velocity, restic, Tailscale, Cloudflare Tunnel, ufw, iptables, fail2ban, LVM, zram, MariaDB, VictoriaMetrics, Grafana, Bash</p>
+                    <p class="stack">Linux (Ubuntu Server), Docker, Bash, restic, Tailscale, Cloudflare Tunnel, iptables, fail2ban, LVM, MariaDB, Grafana, Pelican</p>
                 </div>
             </details>
             <details>
@@ -226,8 +225,8 @@
                 <div class="body">
                     <ul>
                         <li>Replaces the hard clamp with a curve that matches vanilla exactly below the cap and approaches 100% asymptotically above it, so extra armor always helps a little.</li>
-                        <li>Raises Bukkit's attribute limits through reflection into the server's attribute registry, falling back to summing modifiers by hand if a future build breaks it.</li>
-                        <li>Fixed a bug where a deprecated damage-modifier API double-applied armor and turned hits into healing. The damage formula is checked with Python unit tests.</li>
+                        <li>Lifts the server's hard-coded attribute limits with Java reflection, with a fallback in case a future server version breaks it.</li>
+                        <li>Fixed a bug where a deprecated API applied armor twice and turned hits into healing. The damage formula has unit tests.</li>
                     </ul>
                     <p class="stack">Java 21, Maven, Paper API · <a href="https://github.com/blappay1721/UncapDefense" target="_blank" rel="noopener">Code</a></p>
                 </div>
@@ -245,7 +244,7 @@
                     <ul>
                         <li>Inside chosen WorldGuard regions, players can break only blocks placed after the region was armed. Terrain and earlier builds stay protected.</li>
                         <li>Uses CoreProtect's block log as the source of truth, with a 10-second in-memory cache covering its async write delay.</li>
-                        <li>Running live on three servers. Overlapping regions apply the strictest cutoff. Admin commands arm, add and remove regions with tab completion.</li>
+                        <li>Overlapping regions apply the strictest rule; admins manage regions with tab-completing commands.</li>
                     </ul>
                     <p class="stack">Java 21, Maven, Paper API, WorldGuard, CoreProtect · <a href="https://github.com/blappay1721/placedonlybreak" target="_blank" rel="noopener">Code</a></p>
                 </div>
@@ -263,7 +262,7 @@
                     <ul>
                         <li>Rewired an existing item and inventory renderer to read a different chat plugin, so <code>[item]</code>, <code>[inv]</code> and <code>[ec]</code> show up in Discord as rendered images.</li>
                         <li>Trigger syntax and permissions come straight from the host chat plugin's config, so the two can never disagree.</li>
-                        <li>One small version-specific module per Minecraft release, 24 in all from 1.19 up, loaded by reflection at startup. Dropped the 19 legacy modules, proxy support and bundled libraries the new host didn't need.</li>
+                        <li>Supports 24 Minecraft versions (1.19 and up) through small per-version modules loaded at startup. Removed 19 legacy modules and dependencies the new host didn't need.</li>
                     </ul>
                     <p class="stack">Java 21, Maven, Paper API, DiscordSRV · <a href="https://github.com/blappay1721/AwesomeChat-DiscordSRV-Addon" target="_blank" rel="noopener">Code</a></p>
                 </div>
@@ -369,6 +368,6 @@
     </footer>
 </main>
 
-<script src="script.js?v=20"></script>
+<script src="script.js?v=25"></script>
 </body>
 </html>
