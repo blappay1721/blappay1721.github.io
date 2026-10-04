@@ -71,24 +71,64 @@ section:focus, footer:focus { outline: none; }
 }
 
 /* Hero: live nearest-neighbor field */
-.hero { position: relative; min-height: 100svh; display: grid; align-items: end; overflow: hidden; }
+.hero { position: relative; min-height: 100svh; display: grid; align-items: center; overflow: hidden; }
 #field, #field-print { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
 #field-print { display: none; }  /* the printout's outline-only field, drawn by script.js */
-.hero-inner { position: relative; width: min(1120px, 100%); margin: 0 auto; padding: 0 24px 9vh; pointer-events: none; }
+/* Top padding clears the fixed nav */
+.hero-inner {
+    position: relative; width: min(1120px, 100%); margin: 0 auto; padding: 80px 24px 48px; pointer-events: none;
+    container-type: inline-size;
+}
 .hero-inner a, .hero-inner button { pointer-events: auto; }
-/* Portrait: a circle above the name, as wide as "Bernard". The block shrinks to the h1's
-   min-content (its longest word); a %-width image adds nothing to that, so it just fills it. */
-.name-block { width: min-content; }
-.hero-inner { padding-top: clamp(72px, 12vh, 120px); }  /* clears the nav when the portrait makes the hero taller than the screen */
+/* Narrow screens: portrait beside the name, the pair spanning the about text's width.
+   --f is the name's font size: "Bernard" is 3.92em wide and the two-line name 1.76em tall, so
+   portrait (1.76) + gap (.2) + name (3.92) ≈ 5.9em fills the column. Capped by height for short screens. */
+.name-block { --f: min(100cqi / 5.9, 11svh); display: flex; align-items: center; gap: calc(var(--f) * .2); margin: 0 0 24px; }
 .portrait {
-    display: block; width: 100%; height: auto; border-radius: 50%; margin: 0 0 clamp(20px, 3vw, 36px);
+    display: block; flex: none; width: calc(var(--f) * 1.76); height: auto; border-radius: 50%;
     box-shadow: 0 24px 60px -24px rgb(20 33 61 / .55);
 }
 h1 {
-    font-weight: 900; font-size: clamp(3.2rem, 11vw, 9rem); line-height: 0.88;
-    letter-spacing: -0.045em; margin: 0 0 28px;
+    font-weight: 900; font-size: var(--f); line-height: 0.88;
+    letter-spacing: -0.045em; margin: 0;
 }
-.lede { font-size: clamp(1.15rem, 2vw, 1.45rem); line-height: 1.4; max-width: 30ch; margin: 0 0 28px; font-weight: 500; }
+.lede { font-size: clamp(1rem, min(1.6vw, 2.4svh), 1.25rem); line-height: 1.5; margin: 0 0 28px; font-weight: 500; }
+/* Hero pills stretch to fill the full width of their row (one row wide, two on phones) */
+.hero .contact > * { flex: 1 1 auto; justify-content: center; }
+/* Phones and tablets: one centered column, narrow enough that the about text reads comfortably */
+@media (max-width: 1023px) { .hero-inner { width: min(688px, 100%); } }
+/* Wide screens: big portrait on the left beside the name and about text, pills along the bottom.
+   The portrait is sized to roughly match the name + about text height beside it. */
+@media (min-width: 1024px) {
+    /* Wider than the sections below so the about text gets a comfortable line length; the nav matches */
+    .nav-inner { width: min(1280px, 100%); }
+    .hero-inner { width: min(1280px, 100%); display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: clamp(40px, 5vw, 72px); row-gap: clamp(20px, 3svh, 32px); }
+    .name-block { display: contents; }
+    .portrait { grid-row: 1 / 3; grid-column: 1; align-self: center; width: min(32vw, 52svh, 480px); }
+    .hero-inner h1 { grid-column: 2; grid-row: 1; align-self: end; font-size: clamp(3rem, min(6vw, 10svh), 6rem); }
+    .hero .lede { grid-column: 2; grid-row: 2; align-self: start; margin: 0; max-width: 60ch; }
+    .hero .contact { grid-column: 1 / -1; grid-row: 3; margin-top: clamp(8px, 2svh, 24px); }
+    .hero .contact > * { flex-basis: 0; }  /* equal widths */
+}
+/* Phones: tighter spacing and a size-down on pills so the hero fits above the browser bars */
+@media (max-width: 640px) {
+    .hero-inner { padding: 64px 24px 24px; }
+    .name-block, .lede { margin-bottom: 20px; }
+    .hero .contact { gap: 8px; }
+    .hero .contact a, .hero .email { padding: 8px 13px; gap: 6px; font-size: .9rem; }
+    .hero .ico { width: 16px; height: 16px; }
+}
+/* Narrow phones: a bit tighter again so the pills still pair up two per row */
+@media (max-width: 400px) {
+    .hero .contact a, .hero .email { padding: 8px 10px; gap: 5px; font-size: .85rem; }
+    .hero .contact a::after { display: none; }
+}
+/* Short phones (small screens, or tall browser bars) */
+@media (max-width: 640px) and (max-height: 720px) {
+    .hero-inner { padding-top: 60px; }
+    .name-block, .lede { margin-bottom: 16px; }
+    .lede { font-size: .9375rem; line-height: 1.45; }
+}
 .contact { display: flex; gap: 12px; flex-wrap: wrap; }
 /* Pill buttons: outlined, fill white from the left on hover */
 .contact a, .email {
@@ -108,7 +148,7 @@ h1 {
 @media (prefers-reduced-motion: reduce) { .contact a, .email { transition: color .25s, box-shadow .25s; } }
 /* Hero text and buttons rise in on load */
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } }
-.hero-inner > *, .hero .contact > * { animation: rise .7s cubic-bezier(.2,.7,.2,1) backwards; }
+.hero-inner > :not(.name-block), .name-block > *, .hero .contact > * { animation: rise .7s cubic-bezier(.2,.7,.2,1) backwards; }
 .lede { animation-delay: .12s; }
 .hero .contact > :nth-child(1) { animation-delay: .24s; }
 .hero .contact > :nth-child(2) { animation-delay: .3s; }
@@ -116,7 +156,7 @@ h1 {
 .hero .contact > :nth-child(4) { animation-delay: .42s; }
 .hero .contact { animation: none; }
 @keyframes fade { from { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .hero-inner > *, .hero .contact > * { animation-name: fade; } }
+@media (prefers-reduced-motion: reduce) { .hero-inner > :not(.name-block), .name-block > *, .hero .contact > * { animation-name: fade; } }
 .caption { position: absolute; right: 24px; bottom: 24px; max-width: 30ch; font-size: 0.85rem; color: var(--soft); text-align: right; margin: 0; }
 
 /* Body sections */
@@ -285,7 +325,7 @@ footer p { font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 700; letter-spaci
     .hero { min-height: 0; display: block; border-radius: 10pt; padding: 22pt 18pt 16pt; border: 1px solid var(--rule); }
     #field { display: none; }
     .name-block { width: auto; }  /* the name prints on one line here */
-    .portrait { width: 64pt; margin-bottom: 8pt; box-shadow: none; }
+    .portrait { width: 64pt !important; margin-bottom: 8pt; box-shadow: none; }  /* beats the inline width script.js sets on wide screens */
     #field-print { display: block; object-fit: cover; }
     h1 { font-size: 30pt; margin: 0 0 4pt; }
     h1 br { display: none; }  /* the space after the <br> in the HTML keeps "Bernard Lappay" apart */

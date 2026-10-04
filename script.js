@@ -365,3 +365,23 @@ document.querySelectorAll('.email').forEach(btn => {
         btn.reset = setTimeout(() => { label.textContent = email; btn.style.minWidth = ''; }, 2000);
     });
 });
+
+// Wide hero: the portrait's diameter matches the name + about text beside it, 1:1. Widening the
+// portrait narrows the text column and makes the text taller, so settle it in a few passes
+// (it converges fast). offsetTop/Height ignore the entrance animation's transforms.
+(() => {
+    const portrait = document.querySelector('.portrait'), h1 = document.querySelector('.hero h1');
+    const lede = document.querySelector('.hero .lede'), wide = matchMedia('(min-width: 1024px)');
+    function fit() {
+        portrait.style.width = '';
+        if (!wide.matches) return;
+        for (let i = 0; i < 8; i++) {
+            const h = lede.offsetTop + lede.offsetHeight - h1.offsetTop;
+            if (Math.abs(h - portrait.offsetWidth) < 1) break;
+            portrait.style.width = h + 'px';
+        }
+    }
+    fit();
+    document.fonts.ready.then(fit);
+    addEventListener('resize', fit);
+})();
