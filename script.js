@@ -65,13 +65,19 @@
     }
 
     // On window, not the hero: the fixed nav sits over the hero and would swallow the events.
-    addEventListener('pointermove', e => {
+    // The cursor's screen position is kept so scrolling (which moves the hero under a still cursor)
+    // re-places the probe too; otherwise the highlight drifts away until the mouse moves again.
+    let cursor = null;
+    function placeProbe() {
+        if (!cursor) return;
         const r = hero.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        const x = (cursor[0] - r.left) / r.width, y = (cursor[1] - r.top) / r.height;
         probe = x >= 0 && x <= 1 && y >= 0 && y <= 1 ? [x, y] : null;
         if (still.matches && visible) draw();
-    });
-    document.documentElement.addEventListener('pointerleave', () => { probe = null; draw(); });
+    }
+    addEventListener('pointermove', e => { cursor = [e.clientX, e.clientY]; placeProbe(); });
+    addEventListener('scroll', placeProbe, { passive: true });
+    document.documentElement.addEventListener('pointerleave', () => { cursor = probe = null; draw(); });
     new IntersectionObserver(([e]) => visible = e.isIntersecting).observe(hero);
     dark.addEventListener('change', () => { readColors(); draw(); });
     addEventListener('resize', resize);
