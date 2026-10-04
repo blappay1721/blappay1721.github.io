@@ -28,18 +28,24 @@
         const [a, b, edge, pc] = colors, d = img.data;
         const pts = seeds.map(s => [s.x * w, s.y * h, s.t]);
         if (probe) pts.push([probe[0] * w, probe[1] * h, -1]);
-        // ponytail: brute-force nearest seed per cell, O(cells × seeds); fine at 8px cells and 17 seeds
+        const n = pts.length, dist = new Float64Array(n);
+        const gaps = pts.map(p => pts.map(q => Math.hypot(p[0] - q[0], p[1] - q[1])));
+        // ponytail: brute-force per cell, O(cells × seeds); fine at 8px cells and 17 seeds
         for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i += 4) {
-            let d1 = Infinity, d2 = Infinity, k = 0, k2 = 0;
-            for (let j = 0; j < pts.length; j++) {
-                const dx = pts[j][0] - x, dy = pts[j][1] - y, dd = dx * dx + dy * dy;
-                if (dd < d1) { d2 = d1; k2 = k; d1 = dd; k = j; } else if (dd < d2) { d2 = dd; k2 = j; }
+            let d1 = Infinity, k = 0;
+            for (let j = 0; j < n; j++) {
+                const dx = pts[j][0] - x, dy = pts[j][1] - y;
+                dist[j] = dx * dx + dy * dy;
+                if (dist[j] < d1) { d1 = dist[j]; k = j; }
             }
-            // Edge = within half a cell of the boundary between the two nearest seeds. That boundary's
-            // distance is (d2 - d1) / (2 × seed gap), which keeps lines one cell wide even where two
-            // seeds sit close together (a plain distance difference smears into a wedge there).
-            const t = pts[k][2], gap = Math.hypot(pts[k][0] - pts[k2][0], pts[k][1] - pts[k2][1]);
-            const c = (d2 - d1) / (2 * gap) < .5 ? edge
+            // Edge = within half a cell of the region's nearest boundary. The boundary with seed j lies
+            // (dj - d1) / (2 × gap) away, which keeps lines one cell wide even where two seeds sit close
+            // together. Checking every j, not just the second-nearest seed, matters: near a border the
+            // neighbor across it is often not the second-nearest seed, and testing only that one left gaps.
+            let e = Infinity;
+            for (let j = 0; j < n; j++) if (j !== k) e = Math.min(e, (dist[j] - d1) / (2 * gaps[k][j]));
+            const t = pts[k][2];
+            const c = e < .5 ? edge
                 : t < 0 ? pc
                 : [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
             d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = 255;
