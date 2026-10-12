@@ -97,7 +97,7 @@
             <p class="sr-only" id="cats-keys">Left and right arrow keys move between categories.</p>
             <div class="cats" role="group" aria-label="Project categories">
                 <button class="cat" type="button" aria-describedby="cats-keys" aria-expanded="false" aria-controls="p-ml">
-                    <span class="cat-name">Machine learning</span>
+                    <span class="cat-name">Machine Learning and LLMs</span>
                     <span class="cat-count"></span>
                     <span class="pie" aria-hidden="true"></span>
                     <span class="tick" aria-hidden="true"></span>
@@ -156,6 +156,28 @@
                         <li>In Discord, <code>/chat</code> opens a channel where the persona posts under their own name and avatar, taking turns with up to 5 people. Needs no public URL or open ports.</li>
                     </ul>
                     <p class="stack">Python, PyTorch, Hugging Face (TRL, PEFT), llama.cpp, Ollama, Node.js, discord.js · <a href="https://github.com/blappay1721/bruh" target="_blank" rel="noopener">Bot code</a> · Model and data pipeline private (built on friends' messages)</p>
+                </div>
+            </details>
+            <details>
+                <summary>
+                    <div class="title">
+                        <h3>Private in-place translation for Discord</h3>
+                        <p class="sub">LLM translation that works in any server or DM, even ones the bot isn't in</p>
+                    </div>
+                    <div class="result"><b>2,000</b><small>translations cached, encrypted</small></div>
+                    <span class="toggle" aria-hidden="true"></span>
+                </summary>
+                <div class="body">
+                    <ul>
+                        <li>Right-click any message or run <code>/translate</code> for a private translation into your Discord language, with a dropdown to switch among 25 others in place.</li>
+                        <li>User-installable message command: Discord sends the message with the interaction, so it works where the bot can't read history.</li>
+                        <li>Translation cache: LRU (Least Recently Used) eviction over 2,000 entries, built on an insertion-ordered <code>Map</code> (re-insert on hit, drop the oldest on overflow). Repeat translations skip the model entirely, and DM text is scoped per user to close a timing side channel.</li>
+                        <li>Cache encryption: convergent encryption with AES-256-GCM. Each entry's key and lookup ID are derived via SHA-256 from (scope, language, text), so memory holds only ciphertext, a random IV and an auth tag, never the original text or the key.</li>
+                        <li>Open cards: up to 500 results (LRU) stay interactive for the language dropdown and page buttons. Each is sealed with AES-256-GCM under a random 256-bit key stored only in the card's button <code>custom_id</code>, which Discord returns on each click, so the bot can't decrypt a card on its own.</li>
+                        <li>Concurrent requests for the same message share one model call; failures are never cached and get specific error messages (rate limit, timeout, outage).</li>
+                        <li>Preserves markdown, mentions, emoji and code blocks, and pages long results at Discord's 4,096-character limit. About 175 lines, no new dependencies.</li>
+                    </ul>
+                    <p class="stack">Node.js, discord.js, Ollama Cloud (gpt-oss:120b), Node crypto · <a href="https://github.com/blappay1721/bruh" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             <details>
