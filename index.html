@@ -162,15 +162,14 @@
                 <summary>
                     <div class="title">
                         <h3>Private in-place translation for Discord</h3>
-                        <p class="sub">LLM translation that works in any server or DM, even ones the bot isn't in</p>
+                        <p class="sub">LLM translation that works in any server or DM</p>
                     </div>
                     <div class="result"><b>2,000</b><small>translations cached, encrypted</small></div>
                     <span class="toggle" aria-hidden="true"></span>
                 </summary>
                 <div class="body">
                     <ul>
-                        <li>Right-click any message or run <code>/translate</code> for a private translation into your Discord language, with a dropdown to switch among 25 others in place.</li>
-                        <li>User-installable message command: Discord sends the message with the interaction, so it works where the bot can't read history.</li>
+                        <li>Translations are sent as ephemeral replies, so only the user who asked can see them.</li>
                         <li>Translation cache: LRU (Least Recently Used) eviction over 2,000 entries, built on an insertion-ordered <code>Map</code> (re-insert on hit, drop the oldest on overflow). Repeat translations skip the model entirely, and DM text is scoped per user to close a timing side channel.</li>
                         <li>Cache encryption: convergent encryption with AES-256-GCM. Each entry's key and lookup ID are derived via SHA-256 from (scope, language, text), so memory holds only ciphertext, a random IV and an auth tag, never the original text or the key.</li>
                         <li>Open cards: up to 500 results (LRU) stay interactive for the language dropdown and page buttons. Each is sealed with AES-256-GCM under a random 256-bit key stored only in the card's button <code>custom_id</code>, which Discord returns on each click, so the bot can't decrypt a card on its own.</li>
