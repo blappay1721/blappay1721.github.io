@@ -251,8 +251,9 @@
                         <li>Replaces the hard clamp with a curve that matches vanilla exactly below the cap and approaches 100% asymptotically above it, so extra armor always helps a little.</li>
                         <li>Lifts the server's hard-coded attribute limits with Java reflection, with a fallback in case a future server version breaks it.</li>
                         <li>Fixed a bug where a deprecated API applied armor twice and turned hits into healing. The damage formula has unit tests.</li>
+                        <li>One jar runs on Paper 1.16.5 through 26.3: compiled against the newest API but targeting Java 16, and boot-tested on 11 real server versions.</li>
                     </ul>
-                    <p class="stack">Java 21, Maven, Paper API · <a href="https://github.com/blappay1721/UncapDefense" target="_blank" rel="noopener">Code</a></p>
+                    <p class="stack">Java, Maven, Paper API ·<a href="https://github.com/blappay1721/UncapDefense" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             <details>
@@ -269,8 +270,9 @@
                         <li>Inside chosen WorldGuard regions, players can break only blocks placed after the region was armed. Terrain and earlier builds stay protected.</li>
                         <li>Uses CoreProtect's block log as the source of truth, with a 10-second in-memory cache covering its async write delay.</li>
                         <li>Overlapping regions apply the strictest rule; admins manage regions with tab-completing commands.</li>
+                        <li>One jar runs on Minecraft 1.13.2 through 26.3 (Java 8 bytecode), tested end-to-end on five versions. If WorldGuard or CoreProtect can't start, it disables itself cleanly instead of erroring.</li>
                     </ul>
-                    <p class="stack">Java 21, Maven, Paper API, WorldGuard, CoreProtect · <a href="https://github.com/blappay1721/placedonlybreak" target="_blank" rel="noopener">Code</a></p>
+                    <p class="stack">Java 8, Maven, Spigot API, WorldGuard, CoreProtect · <a href="https://github.com/blappay1721/placedonlybreak" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             <details>
@@ -279,16 +281,17 @@
                         <h3>AwesomeChat DiscordSRV Addon</h3>
                         <p class="sub">Open-source fork that renders in-game items into Discord</p>
                     </div>
-                    <div class="result"><b>24</b><small>Minecraft versions supported</small></div>
+                    <div class="result"><b>25</b><small>Minecraft versions supported</small></div>
                     <span class="toggle" aria-hidden="true"></span>
                 </summary>
                 <div class="body">
                     <ul>
                         <li>Rewired an existing item and inventory renderer to read a different chat plugin, so <code>[item]</code>, <code>[inv]</code> and <code>[ec]</code> show up in Discord as rendered images.</li>
                         <li>Trigger syntax and permissions come straight from the host chat plugin's config, so the two can never disagree.</li>
-                        <li>Supports 24 Minecraft versions (1.19 and up) through small per-version modules loaded at startup. Removed 19 legacy modules and dependencies the new host didn't need.</li>
+                        <li>Supports 25 Minecraft versions (1.19 through 26.3) through small per-version modules loaded at startup. Removed 19 legacy modules and dependencies the new host didn't need.</li>
+                        <li>Images and GIFs posted in Discord, including Tenor and Klipy links, show up in game as a clickable label that opens them on a map.</li>
                     </ul>
-                    <p class="stack">Java 21, Maven, Paper API, DiscordSRV · <a href="https://github.com/blappay1721/AwesomeChat-DiscordSRV-Addon" target="_blank" rel="noopener">Code</a></p>
+                    <p class="stack">Java 21, Gradle, Paper API, DiscordSRV · <a href="https://github.com/blappay1721/AwesomeChat-DiscordSRV-Addon" target="_blank" rel="noopener">Code</a></p>
                 </div>
             </details>
             </div>
@@ -370,7 +373,7 @@
             <div><h3>AI/ML and inference</h3><p>Claude Code, vLLM, Hugging Face, LoRA (SFT, DPO), RAG, Ollama, NumPy, RunPod</p></div>
             <div><h3>Linux and DevOps</h3><p>Ubuntu Server, systemd, NetworkManager, LVM, rsync, tmux, PM2</p></div>
             <div><h3>Networking and security</h3><p>ufw, fail2ban, iptables, tcpdump, ss, Pi-hole/DNS, SSH/SFTP</p></div>
-            <div><h3>Server development</h3><p>Java 21, Maven, Paper API, Velocity, JVM stack-trace debugging</p></div>
+            <div><h3>Server development</h3><p>Java, Maven, Gradle, Paper API, Velocity, JVM stack-trace debugging</p></div>
             <div><h3>Tools</h3><p>Git, Vim, VS Code Remote, ModelSim, LaTeX</p></div>
         </div>
     </section>
