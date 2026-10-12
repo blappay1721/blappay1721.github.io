@@ -174,7 +174,7 @@
                         <li>Cache encryption: convergent encryption with AES-256-GCM. Each entry's key and lookup ID are derived via SHA-256 from (scope, language, text), so memory holds only ciphertext, a random IV and an auth tag, never the original text or the key.</li>
                         <li>Open cards: up to 500 results (LRU) stay interactive for the language dropdown and page buttons. Each is sealed with AES-256-GCM under a random 256-bit key stored only in the card's button <code>custom_id</code>, which Discord returns on each click, so the bot can't decrypt a card on its own.</li>
                         <li>Concurrent requests for the same message share one model call; failures are never cached and get specific error messages (rate limit, timeout, outage).</li>
-                        <li>Preserves markdown, mentions, emoji and code blocks, and pages long results at Discord's 4,096-character limit. About 175 lines, no new dependencies.</li>
+                        <li>Preserves markdown, mentions, emoji and code blocks, and pages long results at Discord's 4,096-character limit.</li>
                     </ul>
                     <p class="stack">Node.js, discord.js, Ollama Cloud (gpt-oss:120b), Node crypto · <a href="https://github.com/blappay1721/bruh" target="_blank" rel="noopener">Code</a></p>
                 </div>
