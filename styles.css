@@ -76,10 +76,9 @@ section:focus, footer:focus { outline: none; }
 #field-print { display: none; }  /* the printout's outline-only field, drawn by script.js */
 /* Top padding clears the fixed nav */
 .hero-inner {
-    position: relative; width: min(1120px, 100%); margin: 0 auto; padding: 80px 24px 48px; pointer-events: none;
+    position: relative; width: min(1120px, 100%); margin: 0 auto; padding: 80px 24px 48px;
     container-type: inline-size;
 }
-.hero-inner a, .hero-inner button { pointer-events: auto; }
 /* Narrow screens: portrait beside the name, the pair spanning the about text's width.
    --f is the name's font size: "Bernard" is 3.92em wide and the two-line name 1.76em tall, so
    portrait (1.76) + gap (.2) + name (3.92) ≈ 5.9em fills the column. Capped by height for short screens. */
@@ -297,7 +296,13 @@ footer p { font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 700; letter-spaci
 }
 
 /* 404 page */
-.notfound { min-height: 100svh; display: grid; align-content: center; }
+/* Plain centered stack, overriding the homepage hero's grid and gaps. Proximity sets the rhythm:
+   the message and its button are one unit, so they sit closer than the message sits to the 404. */
+.notfound .hero-inner { display: block; text-align: center; }
+.notfound h1 { font-size: clamp(6rem, 30vw, 16rem); margin: 0 0 clamp(16px, 3svh, 28px); }
+.notfound .lede { max-width: none; margin: 0 0 clamp(12px, 2svh, 20px); text-wrap: balance; }
+.notfound .contact { justify-content: center; margin: 0; }
+.notfound .contact > * { flex: none; }  /* sized to its label, not stretched */
 
 /* Windows High Contrast and other forced-color modes drop box-shadows and backgrounds,
    which draw these borders and the +/− marks; give them real borders and system colors */
